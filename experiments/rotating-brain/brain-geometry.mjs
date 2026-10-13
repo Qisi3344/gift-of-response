@@ -37,47 +37,61 @@ export function assembleBrain(T, G, body, layer) {
       add(hand+"."+l.id+".shell",[x+side*(l.offset||0),l.y,l.z],
           [0,1,0],l.len,l.r,l.mat);
     }
-    // Sulci are *dark recessed seam lines*, not raised chrome caterpillars.
-    // Irregularly spaced and interrupted; 2-3 per lobe rather than a grid.
-    // Each polyline is sampled on the lobe's actual 3D surface.
-    const plan=[
-      ["frontal",[-31.0,-22.6,-13.5]],
-      ["parietal",[-9.0,-0.8,8.2]],
-      ["occipital",[14.9,23.4]],
+    // Replace raised worms and ink-like sulci with genuine shallow cortical
+    // metal *plates*. Dark creases are negative space between adjacent plates.
+    // Each plate has a separate 3D prism, rounded outline, real bevel and
+    // material; its normal follows the capsule shell at the mounting point.
+    const pattern=[
+      { l:"frontal",ys:[-29.4,-20.7,-13.6],ts:[.30,.99,1.68,2.34],width:6.1,length:6.4 },
+      { l:"parietal",ys:[-10.4,-1.8,7.2,14.7],ts:[.28,.96,1.65,2.33],width:6.4,length:7.8 },
+      { l:"occipital",ys:[18.9,23.6],ts:[.45,1.24,2.10],width:4.8,length:4.8 },
     ];
-    for(const [name,rows] of plan){
-      const l=lobes.find(k=>k.id===name);
-      for(let row=0;row<rows.length;row++){
-        const yc=rows[row], segments=row%2===0?2:1;
-        for(let seg=0;seg<segments;seg++){
-          const n=15;
-          const a0=(seg===0?.19:1.53)+.10*((row+seg)%2);
-          const a1=(seg===0?1.74:2.81)-.09*row;
-          const pts=[];
-          for(let q=0;q<=n;q++){
-            const t=q/n;
-            const a=a0+(a1-a0)*t;
-            const wav=2.2*Math.sin((t*1.45+row*.34+seg*.37)*Math.PI) +
-              .7*Math.sin(t*3.3*Math.PI+row*1.5);
-            const y=yc+wav;
-            const rr=rAt(l,y)+.18;
-            pts.push([x+side*rr*Math.cos(a),y,l.z+rr*Math.sin(a)]);
-          }
-          curve(hand+".sulcus."+name+"."+row+"."+seg,pts,.26+(row===1?.06:0));
+    for(const rule of pattern){
+      const l=lobes.find(k=>k.id===rule.l);
+      for(let row=0;row<rule.ys.length;row++) {
+        for(let col=0;col<rule.ts.length;col++) {
+          // Deterministic imperfections, not a repeated tile texture.
+          const jitter=(row*7+col*11+(side===1?5:0));
+          const yy=rule.ys[row]+.72*Math.sin(jitter*1.31);
+          const theta=rule.ts[col]+.055*Math.cos(jitter*.73);
+          const rr=rAt(l,yy)+.12;
+          const origin=[x+side*rr*Math.cos(theta),yy,l.z+rr*Math.sin(theta)];
+          const n=[side*Math.cos(theta),0,Math.sin(theta)];
+          const tangent=[Math.sin(theta),0,-side*Math.cos(theta)];
+          const width=rule.width*(.91+.07*Math.sin(jitter*.92));
+          const height=rule.length*(.91+.06*Math.cos(jitter*1.17));
+          const poly=[
+            [-width*.43,-height*.42],
+            [ width*.12,-height*.50],
+            [ width*.50,-height*.15],
+            [ width*.43, height*.42],
+            [-width*.14, height*.51],
+            [-width*.52, height*.12],
+          ];
+          T.prism({
+            name:hand+".cortical-plate."+rule.l+"."+row+"."+col,
+            group:body,layer,
+            F:{o:origin,a:n,u:tangent,v:[0,1,0]},
+            polygon:poly,
+            s0:-.15,s1:.58,round:.50,bevel:.19,
+            material:(row+col)%5===0?"chrome":"steel",
+            tone:"mid",crease:"faint",
+          });
+          pieces.push(hand+".plate."+rule.l+"."+row+"."+col);
         }
       }
     }
-    // The lateral fissure is an interrupted, purposeful dark separation
-    // above the temporal shell. Not a copper zipper laid across the brain.
-    for(let strip=0;strip<2;strip++){
-      const pts=[];
-      for(let q=0;q<=11;q++){
-        const t=q/11, y=-16+(strip*13)+t*9.5;
-        const l=lobes[1], rr=rAt(l,y)+.08;
-        const a=.12+.065*Math.sin(t*Math.PI);
-        pts.push([x+side*rr*Math.cos(a),y,l.z+rr*Math.sin(a)]);
+    // The two fissure lines are structural boundaries, not raised filaments.
+    // Keep thin and dark; never distribute fluorescent wires over the cortex.
+    for(let i=0;i<2;i++){
+      const pts=[],l=lobes[1];
+      for(let q=0;q<=10;q++){
+        const t=q/10, y=-11+i*15+t*5.4;
+        const theta=.08+.06*Math.sin(t*Math.PI);
+        const rr=rAt(l,y)+.05;
+        pts.push([x+side*rr*Math.cos(theta),y,l.z+rr*Math.sin(theta)]);
       }
-      curve(hand+".lateral-fissure."+strip,pts,.33,"gunmetal");
+      curve(hand+".sylvian-seam."+i,pts,.14,"gunmetal");
     }
     // Tiny *machined* fasteners stay on exposed lower hardware, not the gyri.
     for(let i=0;i<3;i++){
