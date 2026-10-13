@@ -24,15 +24,25 @@ const Exhibit = (() => {
         const d=`M ${at([48.4*Math.cos(a),48.4*Math.sin(a),48])} L ${at([48.4*Math.cos(a),48.4*Math.sin(a),136])}`;
         streaks+=`<path d="${d}" stroke="#eef7f0" stroke-opacity="${(.1*facing).toFixed(3)}" stroke-width="${soft}" stroke-linecap="round"/><path d="${d}" stroke="#f6fcf8" stroke-opacity="${(.34*facing).toFixed(3)}" stroke-width="${wide}" stroke-linecap="round"/>`;
       }
-      // Dome cap: fill follows the full base ellipse so no chord line appears;
-      // only the silhouette profile and a short glint are stroked.
+      // Ellipsoid silhouette: its normal is perpendicular to the view ray.
+      // A centre-plane half-circle covers only half the projected dome.
+      // Seat the shallow cap inside the clamp's 46.5-unit inner radius.
+      const elevation=P.elevation*Math.PI/180,radius=45,height=6;
+      const tangent=Math.hypot(radius*Math.sin(elevation),height*Math.cos(elevation));
+      const depth=radius*radius*Math.sin(elevation)/tangent;
+      const rise=height*height*Math.cos(elevation)/tangent;
+      const domePoint=t=>[
+        radius*Math.cos(t)*Math.cos(view+Math.PI/2)-depth*Math.sin(t)*Math.cos(view),
+        radius*Math.cos(t)*Math.sin(view+Math.PI/2)-depth*Math.sin(t)*Math.sin(view),
+        149+rise*Math.sin(t)
+      ];
       const profile=[];
-      for(let i=0;i<=40;i++){const t=Math.PI*i/40;profile.push([49*Math.cos(t)*Math.cos(view+Math.PI/2),49*Math.cos(t)*Math.sin(view+Math.PI/2),149+12*Math.sin(t)]);}
+      for(let i=0;i<=80;i++)profile.push(domePoint(Math.PI*i/80));
       const baseArc=[];
-      for(let i=0;i<=40;i++){const t=view-Math.PI/2+Math.PI*i/40;baseArc.push([49*Math.cos(t),49*Math.sin(t),149]);}
+      for(let i=0;i<=40;i++){const t=view-Math.PI/2+Math.PI*i/40;baseArc.push([radius*Math.cos(t),radius*Math.sin(t),149]);}
       const glint=[];
-      for(let i=6;i<=16;i++){const t=Math.PI*i/40;glint.push([49*Math.cos(t)*Math.cos(view+Math.PI/2),49*Math.cos(t)*Math.sin(view+Math.PI/2),149+12*Math.sin(t)]);}
-      const lid=`<path d="M ${profile.map(at).join(' L ')} L ${baseArc.map(at).join(' L ')} Z" fill="#c1d5ce" fill-opacity=".1" stroke="none"/><path d="M ${profile.map(at).join(' L ')}" fill="none" stroke="#c6d4c8" stroke-opacity=".4" stroke-width=".7"/><path d="M ${glint.map(at).join(' L ')}" fill="none" stroke="#f2faf4" stroke-opacity=".55" stroke-width="1.3" stroke-linecap="round"/>`;
+      for(let i=6;i<=16;i++)glint.push(domePoint(Math.PI*i/40));
+      const lid=`<path id="glass-lid" d="M ${profile.map(at).join(' L ')} L ${baseArc.map(at).join(' L ')} Z" fill="#c1d5ce" fill-opacity=".1" stroke="none"/><path d="M ${profile.map(at).join(' L ')}" fill="none" stroke="#c6d4c8" stroke-opacity=".4" stroke-width=".7"/><path d="M ${glint.map(at).join(' L ')}" fill="none" stroke="#f2faf4" stroke-opacity=".55" stroke-width="1.3" stroke-linecap="round"/>`;
       stage.querySelector('.glass-front').innerHTML=`${streaks}${lid}`;
     }
     function render(state){

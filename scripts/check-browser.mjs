@@ -8,7 +8,28 @@ const check=(js,message)=>['eval',`(()=>{if(!(${js}))throw Error(${JSON.stringif
 const readout=`document.querySelector('[data-readout]').textContent`;
 const steps=[
   check('document.querySelectorAll("[data-live] [data-name]").length > 150','real 3D parts mounted'),
+  check(`(()=>{
+    const matrices=[...document.querySelectorAll('#exhibit > svg')].map(el=>el.getScreenCTM());
+    return matrices.every(m=>['a','b','c','d','e','f'].every(key=>Math.abs(m[key]-matrices[0][key])<.01));
+  })()`,'glass and solid layers share the same screen projection'),
   ['shot',`shots/${mode}-front.png`,'.page',1],
+  check(`(()=>{
+    for(const angle of [0,90,180,270]){
+      window.__isoTurn.set(angle);
+      const lid=document.getElementById('glass-lid');
+      const P={...exhibitProjection,azimuth:exhibitProjection.azimuth-angle};
+      const points=[[0,0,155],...Array.from({length:16},(_,i)=>{
+        const a=i*Math.PI/8;return [31*Math.cos(a),31*Math.sin(a),149+6*Math.sqrt(1-(31/45)**2)];
+      })];
+      if(!points.every(p=>{const [x,y]=k.iso(p,P);return lid.isPointInFill(new DOMPoint(x,y));}))return false;
+      // The glass must never paint over the outer edge of the retaining ring.
+      if(!Array.from({length:32},(_,i)=>{
+        const a=i*Math.PI/16,[x,y]=k.iso([48.8*Math.cos(a),48.8*Math.sin(a),149],P);
+        return !lid.isPointInFill(new DOMPoint(x,y));
+      }).every(Boolean))return false;
+    }
+    window.__isoTurn.set(0);return true;
+  })()`,'full glass dome covers both halves at four rotation angles'),
   ['eval',`window.beforeOrbit=Object.fromEntries(['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'].map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));`],
   ['key','ArrowRight','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.angle)>14.9'],
   check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').outerHTML!==v)`,'keyboard turns brain, base, chamber structure and gauge together'),

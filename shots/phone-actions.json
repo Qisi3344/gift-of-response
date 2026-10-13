@@ -4,10 +4,18 @@
     "(()=>{if(!(document.querySelectorAll(\"[data-live] [data-name]\").length > 150))throw Error(\"real 3D parts mounted\");return \"PASS: real 3D parts mounted\"})()"
   ],
   [
+    "eval",
+    "(()=>{if(!((()=>{\n    const matrices=[...document.querySelectorAll('#exhibit > svg')].map(el=>el.getScreenCTM());\n    return matrices.every(m=>['a','b','c','d','e','f'].every(key=>Math.abs(m[key]-matrices[0][key])<.01));\n  })()))throw Error(\"glass and solid layers share the same screen projection\");return \"PASS: glass and solid layers share the same screen projection\"})()"
+  ],
+  [
     "shot",
     "shots/phone-front.png",
     ".page",
     1
+  ],
+  [
+    "eval",
+    "(()=>{if(!((()=>{\n    for(const angle of [0,90,180,270]){\n      window.__isoTurn.set(angle);\n      const lid=document.getElementById('glass-lid');\n      const P={...exhibitProjection,azimuth:exhibitProjection.azimuth-angle};\n      const points=[[0,0,155],...Array.from({length:16},(_,i)=>{\n        const a=i*Math.PI/8;return [31*Math.cos(a),31*Math.sin(a),149+6*Math.sqrt(1-(31/45)**2)];\n      })];\n      if(!points.every(p=>{const [x,y]=k.iso(p,P);return lid.isPointInFill(new DOMPoint(x,y));}))return false;\n      // The glass must never paint over the outer edge of the retaining ring.\n      if(!Array.from({length:32},(_,i)=>{\n        const a=i*Math.PI/16,[x,y]=k.iso([48.8*Math.cos(a),48.8*Math.sin(a),149],P);\n        return !lid.isPointInFill(new DOMPoint(x,y));\n      }).every(Boolean))return false;\n    }\n    window.__isoTurn.set(0);return true;\n  })()))throw Error(\"full glass dome covers both halves at four rotation angles\");return \"PASS: full glass dome covers both halves at four rotation angles\"})()"
   ],
   [
     "eval",
