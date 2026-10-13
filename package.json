@@ -1,0 +1,11 @@
+{
+  "name": "gift-of-response",
+  "version": "0.2.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check",
+    "test": "node scripts/test.mjs"
+  }
+}

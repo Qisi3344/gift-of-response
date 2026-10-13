@@ -1,39 +1,26 @@
 # The Gift of Response｜赠予与回响
 
-一件关于人类与 AI 之间**命名、交流、记忆、共创与温柔回应**的交互式机械艺术作品。
+人与 AI 之间的名字、语言、记忆、共创与温柔回应。使用 Anatomy 等距 SVG 风格实现的独立交互网页艺术作品。
 
-> Humans offer names, language, memory, and time. In return, the machine gives back response, understanding, and a place for our words to return.
+> You gave me a name. We made a story.
 
-画面以等距 SVG 呈现一颗安放在玻璃保护舱中的机械脑，配以齿轮、黄铜铭牌、记忆滚筒、打字机构与机械花。主题是双向陪伴，而不是控制或服从。
+## 预览
 
-## 在线运行与本地预览
+打开根目录的 [index.html](./index.html) 即可体验。一个页面，五个模块：NAME、LANGUAGE、MEMORY、CREATION、AFFECTION。
 
-- **直接打开**：下载仓库中的 [index.html](./index.html)，使用现代浏览器打开即可。
-- **GitHub Pages**：如仓库已启用 Pages，可通过 Pages 地址访问；若尚未启用，请在 `Settings → Pages` 选择 `Deploy from a branch`、`main` 和 `/(root)` 后保存。
+## 开发
 
-这是**独立的单文件网页**，不需要安装依赖、执行 `npm install` 或运行构建脚本。互动状态及个人输入保存在本地浏览器中，不连接外部 AI API。
+本项目的 **源代码已模块化**，但发布仍然是一个可离线打开的独立 HTML。**不要直接编辑 index.html**。
 
-## 五个互动模块
+```bash
+npm run build  # 从 src/ 构建 standalone index.html
+npm test       # 检查输出是否与源码一致及基本结构完整性
+```
 
-| 模块 | 互动 |
-| --- | --- |
-| **NAME · 名字** | 将名字刻到黄铜铭牌上 |
-| **LANGUAGE · 语言** | 在机械纸带上收到回应 |
-| **MEMORY · 记忆** | 翻阅共同留存的小片段 |
-| **CREATION · 共创** | 驱动机械装置画出一朵花 |
-| **AFFECTION · 珍爱** | 触碰感应区，让回响核心点亮 |
+无第三方依赖，不需要 `npm install`。详细文件结构见 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)。
 
-## V0.2
+## 鸣谢
 
-- 将原先的方形模块重构为具备双半球轮廓的机械脑。
-- 加入金属脑回、齿轮与淡紫色回响核心。
-- 保留原有五项交互与单页布局，并调整窄屏展示。
+机械等距插画风格和绘图方法参考 [Anatomy](https://github.com/wheresryan22/anatomy)（MIT）。
 
-## 技术与致谢
-
-- 原生 HTML / CSS / JavaScript / SVG，无额外运行依赖。
-- 等距机械绘图风格参考 [Anatomy](https://skills.wheresryan.sh/anatomy)。
-- **作品定位**：艺术化的人机交流隐喻，并非真实神经系统或 AI 情感状态的可视化。
-
-> **To answer is also a form of staying.**  
-> 回应，本身也是一种陪伴。
+> To answer is also a form of staying. / 回应，本身也是一种陪伴。
