@@ -7,6 +7,9 @@ on:
       - 'docs/3D_DESIGN_CONTRACT.md'
       - '.github/workflows/brain3d-preview.yml'
   workflow_dispatch:
+concurrency:
+  group: brain3d-prototype
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
@@ -35,11 +38,23 @@ jobs:
           test -s experiments/rotating-brain/index.html
           grep -q 'data-live="brain"' experiments/rotating-brain/index.html
           grep -q 'TURN.mount' experiments/rotating-brain/index.html
+      - name: Capture rendered front and back screenshots
+        run: |
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME"
+          ROOT="file://$PWD/experiments/rotating-brain/index.html"
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=1400 --window-size=1180,1060 --screenshot=experiments/rotating-brain/front.png "$ROOT?angle=0"
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=1400 --window-size=1180,1060 --screenshot=experiments/rotating-brain/back.png "$ROOT?angle=180"
+          test -s experiments/rotating-brain/front.png
+          test -s experiments/rotating-brain/back.png
+          test "$(sha256sum experiments/rotating-brain/front.png | cut -c1-64)" != "$(sha256sum experiments/rotating-brain/back.png | cut -c1-64)"
+          base64 -w 0 experiments/rotating-brain/front.png > experiments/rotating-brain/front.png.b64
+          base64 -w 0 experiments/rotating-brain/back.png > experiments/rotating-brain/back.png.b64
       - name: Publish generated preview to same experimental branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add experiments/rotating-brain/index.html
+          git add experiments/rotating-brain/index.html experiments/rotating-brain/front.png experiments/rotating-brain/back.png experiments/rotating-brain/front.png.b64 experiments/rotating-brain/back.png.b64
           if ! git diff --cached --quiet; then
             git commit -m "build: generate Anatomy 3D rotating brain prototype"
             git push
