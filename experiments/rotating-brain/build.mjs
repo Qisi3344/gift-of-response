@@ -36,29 +36,47 @@ for (const side of [-1,1]) {
            left?"steel":"chrome");
   // Front and occipital volume, just below the lateral surface.
   addRound((left?"left":"right")+".temporal", [x+side*1,-12,75], [0,1,0], 18, 9.0, "gunmetal");
-  // Six staggered, relief-like gyri on each hemisphere. These have depth and
-  // reproject as the sculpture turns; they are not 2D paths.
-  for (let band=0; band<6; band++) {
-    const y=-17+band*7.1;
-    for (let lane=0; lane<4; lane++) {
-      const dx=(-1.5+lane)*5.7;
-      const xx=x+dx;
-      const surface=Math.sqrt(Math.max(0,15.6**2-dx**2));
-      const z=86+surface-0.4;
-      const skew=(band%2?1:-1)*0.16;
-      const center=[xx, y+skew*lane,z];
-      addRound((left?"L":"R")+".gyrus."+band+"."+lane,
-        center, [skew, 0.98, -0.05], 3.4+(band%3)*.8, 1.55+(lane%2)*.22,
-        lane===1?"gold":"steel",["dome","dome"]);
+  // Organic 3D cortical relief: every gyrus follows the capsule surface in XYZ.
+  // Unlike evenly spaced studs, each routed ridge bends across the hemisphere,
+  // with tapered front and rear dome contact and real dynamic occlusion.
+  const shellRadius=y => {
+    const beyond = y < -12 ? -12-y : y > 11 ? y-11 : 0;
+    return Math.sqrt(Math.max(1.5, 15.6**2-beyond**2));
+  };
+  for(let band=0;band<7;band++){
+    const theta0=-0.44+band*.416;
+    for(let row=0;row<6;row++){
+      const y0=-22.5+row*8.2;
+      const route=[];
+      for(let sample=0;sample<=14;sample++){
+        const t=sample/14;
+        const y=y0+7.1*t+0.45*Math.sin(t*Math.PI)*Math.sin(row*.9+band);
+        const theta=theta0+
+          0.11*Math.sin((t*.95+row*.18)*Math.PI) +
+          0.055*Math.cos((t*2.1+band*.4)*Math.PI);
+        const r=shellRadius(y)+0.12;
+        route.push([x+side*r*Math.cos(theta),y,86+r*Math.sin(theta)]);
+      }
+      const name=(left?"L":"R")+".gyrus."+band+"."+row;
+      T.tube({name,group:body,layer,route,r:.85+(row%3)*.12,
+        chunk:18,turn:65,spacing:1.2,
+        material:(band===3||row===2&&band===5)?"gold":"steel",
+        caps:true});
+      parts.push(name);
     }
   }
-  // A peripheral reinforcement runs around the lower hemisphere.
-  for(let p=0;p<7;p++){
-    const y=-20+p*6.6;
-    const xx=x+side*13.4;
-    const z=82+(p%3)*2;
-    addRound((left?"L":"R")+".side-reinforcement."+p,
-      [xx,y,z],[0.02*side,1,0.02],4.6,1.0,"gold");
+  // Lateral copper stitching is a true 3D ribbed cable (not repeated markers).
+  for(let i=0;i<3;i++){
+    const route=[];
+    for(let q=0;q<=12;q++){
+      const y=-18+q*3.0;
+      const theta=-.30+i*.46;
+      const r=shellRadius(y)+.5;
+      route.push([x+side*r*Math.cos(theta),y,86+r*Math.sin(theta)]);
+    }
+    const name=(left?"L":"R")+".lower-braid."+i;
+    T.tube({name,group:body,layer,route,r:.53,chunk:40,turn:65,spacing:1.8,material:"gold"});
+    parts.push(name);
   }
 }
 // Real metal shaft / nexus, mounted inside the two hemispheres.
