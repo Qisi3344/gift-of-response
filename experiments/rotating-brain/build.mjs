@@ -5,6 +5,7 @@ import * as k from "../../.anatomy-upstream/kit/iso-kit.mjs";
 import * as G from "../../.anatomy-upstream/kit/lathe.mjs";
 import { turning } from "../../.anatomy-upstream/kit/turn-build.mjs";
 import { turnScript } from "../../.anatomy-upstream/scripts/inline-kit.mjs";
+import { assembleBrain } from "./brain-geometry.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const WIDTH = 760, HEIGHT = 560;
@@ -17,83 +18,7 @@ const T = turning(P);
 const body = T.group("brain", {turn:{pivot:[0,0]}});
 const layer = T.layer("brain");
 T.stack(["brain"]);
-const parts = [];
-function addRound(name, center, axis, len, radius, material, ends=["dome","dome"], extras={}) {
-  const part = T.round({
-    name, group:body, layer, F:G.frameAlong(center, axis),
-    s0:0, s1:len, r:radius, ends,
-    material, ...extras
-  });
-  parts.push(name);
-  return part;
-}
-// The hemispheres are two actual 3D metal capsules, not two projected SVG silhouettes.
-// A deep narrow longitudinal fissure remains visible through 360 degrees.
-for (const side of [-1,1]) {
-  const left = side < 0;
-  const x = side * 16;
-  addRound((left?"left":"right")+".cortex", [x,-12,86], [0,1,0], 23, 15.6,
-           left?"steel":"chrome");
-  // Front and occipital volume, just below the lateral surface.
-  addRound((left?"left":"right")+".temporal", [x+side*1,-12,75], [0,1,0], 18, 9.0, "gunmetal");
-  // Organic 3D cortical relief: every gyrus follows the capsule surface in XYZ.
-  // Unlike evenly spaced studs, each routed ridge bends across the hemisphere,
-  // with tapered front and rear dome contact and real dynamic occlusion.
-  const shellRadius=y => {
-    const beyond = y < -12 ? -12-y : y > 11 ? y-11 : 0;
-    return Math.sqrt(Math.max(1.5, 15.6**2-beyond**2));
-  };
-  for(let band=0;band<7;band++){
-    const theta0=-0.44+band*.416;
-    for(let row=0;row<6;row++){
-      const y0=-22.5+row*8.2;
-      const route=[];
-      for(let sample=0;sample<=14;sample++){
-        const t=sample/14;
-        const y=y0+7.1*t+0.45*Math.sin(t*Math.PI)*Math.sin(row*.9+band);
-        const theta=theta0+
-          0.11*Math.sin((t*.95+row*.18)*Math.PI) +
-          0.055*Math.cos((t*2.1+band*.4)*Math.PI);
-        const r=shellRadius(y)+0.12;
-        route.push([x+side*r*Math.cos(theta),y,86+r*Math.sin(theta)]);
-      }
-      const name=(left?"L":"R")+".gyrus."+band+"."+row;
-      T.tube({name,group:body,layer,route,r:.85+(row%3)*.12,
-        chunk:18,turn:65,spacing:1.2,
-        material:(band===3||row===2&&band===5)?"gold":"steel",
-        caps:true});
-      parts.push(name);
-    }
-  }
-  // Lateral copper stitching is a true 3D ribbed cable (not repeated markers).
-  for(let i=0;i<3;i++){
-    const route=[];
-    for(let q=0;q<=12;q++){
-      const y=-18+q*3.0;
-      const theta=-.30+i*.46;
-      const r=shellRadius(y)+.5;
-      route.push([x+side*r*Math.cos(theta),y,86+r*Math.sin(theta)]);
-    }
-    const name=(left?"L":"R")+".lower-braid."+i;
-    T.tube({name,group:body,layer,route,r:.53,chunk:40,turn:65,spacing:1.8,material:"gold"});
-    parts.push(name);
-  }
-}
-// Real metal shaft / nexus, mounted inside the two hemispheres.
-addRound("cognitive.spindle",[0,0,49],[0,0,1],38,4.1,"gold",["flat","flat"],
-  {details:{seams:[50,54,60,70,80]}});
-addRound("cognitive.inner-core",[0,0,77],[0,0,1],13,6.2,"chrome",["flat","flat"]);
-for (let i=0;i<6;i++) {
-  const a=i*Math.PI/3;
-  const x=Math.cos(a)*11, y=Math.sin(a)*11;
-  addRound("relay.pin."+i,[x,y,57],[0,0,1],6.5,2.0,i%2?"steel":"gold",["flat","flat"]);
-}
-// Rear lower cerebellum and the small visible transmission stack.
-addRound("cerebellum.lower",[0,-19,68],[1,0,0],17,7.0,"steel");
-for(let i=0;i<3;i++){
-  addRound("bearing.ring."+i,[0,0,55+i*6],[0,0,1],1.1,7.5+i*0.6,
-    i===1?"gold":"chrome",["flat","flat"],{details:{ribs:{s0:55+i*6,s1:56+i*6,count:24,tone:"lo"}}});
-}
+const parts=assembleBrain(T,G,body,layer);
 // Sample independent poses to precompute depth relationships in upstream beta.
 const poses=Array.from({length:25},(_,i)=>({brain:i*15}));
 const out=T.build({poses,statics:[],strict:false});
