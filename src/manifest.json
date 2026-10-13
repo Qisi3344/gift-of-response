@@ -3,20 +3,11 @@
     "src/styles/anatomy.css",
     "src/styles/site.css"
   ],
-  "artwork": [
-    "src/artwork/layers/01-frame-and-base.svgfrag",
-    "src/artwork/layers/02-controls-and-drums.svgfrag",
-    "src/artwork/layers/03-printers-and-carriages.svgfrag",
-    "src/artwork/layers/04-brain-mounts.svgfrag",
-    "src/artwork/layers/05-brain-structure.svgfrag",
-    "src/artwork/layers/06-brain-clockwork.svgfrag",
-    "src/artwork/layers/07-brain-petals.svgfrag",
-    "src/artwork/layers/08-overlay-and-sensors.svgfrag"
-  ],
   "runtime": [
     "src/runtime/anatomy-kit.js",
     "src/runtime/state-machine.js",
     "src/runtime/scene-config.js",
+    "src/runtime/exhibit.js",
     "src/runtime/interaction.js"
   ]
 }
