@@ -50,11 +50,14 @@ jobs:
           ROOT="file://$PWD/experiments/rotating-brain/index.html"
           "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=1400 --window-size=1180,1060 --screenshot=experiments/rotating-brain/front.png "$ROOT?angle=0"
           "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=1400 --window-size=1180,1060 --screenshot=experiments/rotating-brain/back.png "$ROOT?angle=180"
+          "$CHROME" --headless --no-sandbox --disable-gpu --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=1400 --window-size=390,900 --screenshot=experiments/rotating-brain/mobile.png "$ROOT?angle=45"
+          test -s experiments/rotating-brain/mobile.png
           test -s experiments/rotating-brain/front.png
           test -s experiments/rotating-brain/back.png
           test "$(sha256sum experiments/rotating-brain/front.png | cut -c1-64)" != "$(sha256sum experiments/rotating-brain/back.png | cut -c1-64)"
           base64 -w 0 experiments/rotating-brain/front.png > experiments/rotating-brain/front.png.b64
           base64 -w 0 experiments/rotating-brain/back.png > experiments/rotating-brain/back.png.b64
+          base64 -w 0 experiments/rotating-brain/mobile.png > experiments/rotating-brain/mobile.png.b64
       - name: Publish generated preview to same experimental branch
         run: |
           git config user.name "github-actions[bot]"
