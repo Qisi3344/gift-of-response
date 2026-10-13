@@ -5,7 +5,7 @@ import { turning } from '../../vendor/anatomy/turn-build.mjs';
 
 // A single world frame: the specimen, chamber and every instrument turn together.
 export function exhibit() {
-  const P = { origin: [480, 445], scale: 2.18, azimuth: 68, elevation: 24 };
+  const P = { origin: [480, 445], scale: 2.18, azimuth: 45, elevation: 35.2644 };
   const R = A.recorder(P), T = turning(P, { recorder: R });
   const scene = T.group('exhibit', { turn: { pivot: [0, 0] } });
   const paperTravel=T.group('paper',{parent:scene,slide:{direction:[0,1,0],travel:12}});
@@ -52,9 +52,16 @@ export function exhibit() {
   for(const x of [-73,73])for(const y of [-75,75])round(`deck-bolt.${x}.${y}`,x,y,28,1.6,1,'steel');
   round('chamber-pedestal',0,0,28,53,5,'brass',{seams:[29,32],bolts:[{s:33,r:49,count:24,size:.8}]});
   round('chamber-floor',0,0,33,47,3,'gunmetal');
-  ring('lower-glass-clamp',47,2,36,3);
-  ring('upper-glass-clamp',47,2,143,4);
-  ring('crown-edge',48,3,147,2,'copper');
+  ring('lower-glass-clamp',49,2.5,36,3);
+  ring('upper-glass-clamp',49,2.5,143,4);
+  ring('crown-edge',49,2.5,147,2,'copper');
+  // Glass chamber wall: sixteen real annulus segments in a loose group, so the
+  // runtime painter orders them against pillars and brain without audit interlocks.
+  const glassShell=T.group('glass-shell',{parent:scene,free:{origin:[0,0,0]}});
+  for(let i=0;i<16;i++){
+    const a0=i*Math.PI*2/16,a1=(i+1)*Math.PI*2/16;
+    T.prism({...base,group:glassShell,name:`glass-wall.${i}`,F:V(0,0),polygon:[[49*Math.cos(a0),49*Math.sin(a0)],[49*Math.cos(a1),49*Math.sin(a1)],[47*Math.cos(a1),47*Math.sin(a1)],[47*Math.cos(a0),47*Math.sin(a0)]],s0:39,s1:143,material:'glass'});
+  }
   // Four narrow uprights leave a generous uninterrupted view of the specimen.
   for(let i=0;i<4;i++){
     const a=(45+i*90)*Math.PI/180,x=Math.cos(a)*53,y=Math.sin(a)*53;
@@ -90,7 +97,7 @@ export function exhibit() {
       const name=`lobe.${side}.${row}.${col}`;plates.push(name);
       T.prism({...base,name,F,polygon,round:.8,steps:3,s0:-.8,s1:0,bevel:.5,material:row===0&&col%3===0?'copper':'brass',details:{dots:[{at:[0,polygon[0][0]*.65,polygon[0][1]*.65],normal:[1,0,0],size:.45},{at:[0,polygon[2][0]*.65,polygon[2][1]*.65],normal:[1,0,0],size:.45}]}});
     }
-    const top=T.ball({...base,name:`crown-lobe.${side}`,c:[cx,0,107],r:24,flats:[{n:[0,0,-1],d:-23.2}],material:'brass'});
+    const top=T.ball({...base,name:`crown-lobe.${side}`,c:[cx,0,107],r:22,flats:[{n:[0,0,-1],d:-21}],material:'brass'});
     const rear=T.round({...base,name:`cerebral-bearing.${side}`,F:G.frameOf([cx,0,105],[0,1,0],[1,0,0],[0,0,-1]),s0:-29,s1:-27,r:7,material:'steel',details:{bolts:[{s:-29,r:5,count:10,size:.6}]}});
     face(rear,[cx,-29,105],[1,0,0],[0,0,1],'<circle r="4" fill="#252b29" stroke="#9b8151" stroke-width="1"/><circle r="1.7" fill="#baa7ce"/>',[0,-1,0]);
   }
@@ -109,8 +116,8 @@ export function exhibit() {
     const valve=T.round({...base,name:`valve-wheel.${side}`,F:G.frameOf([x,-15,101],[0,1,0],[1,0,0],[0,0,-1]),s0:0,s1:1.5,r:6,material:'copper'});
     face(valve,[x,-13.5,101],[1,0,0],[0,0,-1],'<circle r="4.3" fill="none" stroke="#452d22" stroke-width="2"/><path d="M -4 0 H 4 M 0 -4 V 4" stroke="#c69b68" stroke-width="1.2"/>',[0,1,0]);
     box(`elbow-crown.${side}`,x,-24,136,7,7,6);
-    rod(`crown-feed.${side}`,[x-side*3.5,-24,139],[side*43,-24,139],1.8);
-    box(`glass-port.${side}`,side*40,-24,136,6,8,7);
+    rod(`crown-feed.${side}`,[x-side*3.5,-24,139],[side*50.5,-24,139],1.8);
+    box(`glass-port.${side}`,side*47.5,-24,136,6,8,7);
     rod(`gauge-feed.${side}`,[x,-20.5,84.5],[x,7,84.5],1.8);
     box(`gauge-elbow.${side}`,x,10.5,81,7,7,7);
     rod(`gauge-stem.${side}`,[x,10.5,81],[x,10.5,78],1.8,'steel');

@@ -1,0 +1,223 @@
+[
+  [
+    "eval",
+    "(()=>{if(!(document.querySelectorAll(\"[data-live] [data-name]\").length > 150))throw Error(\"real 3D parts mounted\");return \"PASS: real 3D parts mounted\"})()"
+  ],
+  [
+    "shot",
+    "shots/desktop-front.png",
+    ".page",
+    1
+  ],
+  [
+    "eval",
+    "window.beforeOrbit=Object.fromEntries(['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'].map(n=>[n,document.querySelector('[data-name=\"'+n+'\"]').outerHTML]));"
+  ],
+  [
+    "key",
+    "ArrowRight",
+    "#exhibit"
+  ],
+  [
+    "until",
+    "Number(document.getElementById(\"exhibit\").dataset.angle)>14.9"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name=\"'+n+'\"]').outerHTML!==v)))throw Error(\"keyboard turns brain, base, chamber structure and gauge together\");return \"PASS: keyboard turns brain, base, chamber structure and gauge together\"})()"
+  ],
+  [
+    "drag",
+    "#exhibit",
+    0.3,
+    0.5,
+    0.7,
+    0.5,
+    15
+  ],
+  [
+    "eval",
+    "(()=>{if(!(Number(document.getElementById(\"exhibit\").dataset.angle)>25))throw Error(\"pointer dragging rotates exhibit\");return \"PASS: pointer dragging rotates exhibit\"})()"
+  ],
+  [
+    "eval",
+    "window.__isoTurn.set(90)"
+  ],
+  [
+    "shot",
+    "shots/desktop-side.png",
+    "#exhibit",
+    1
+  ],
+  [
+    "eval",
+    "window.__isoTurn.set(180)"
+  ],
+  [
+    "shot",
+    "shots/desktop-rear.png",
+    "#exhibit",
+    1
+  ],
+  [
+    "eval",
+    "window.__isoTurn.set(270)"
+  ],
+  [
+    "shot",
+    "shots/desktop-opposite.png",
+    "#exhibit",
+    1
+  ],
+  [
+    "click",
+    "#reset-view"
+  ],
+  [
+    "until",
+    "Number(document.getElementById(\"exhibit\").dataset.angle)<.1"
+  ],
+  [
+    "eval",
+    "document.getElementById('name-input').value='小狼 & 木栖';"
+  ],
+  [
+    "key",
+    "Enter",
+    "#name-input"
+  ],
+  [
+    "until",
+    "document.querySelector('[data-readout]').textContent==='Named: 小狼 & 木栖'"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById('engraved-name').textContent==='小狼 & 木栖'))throw Error(\"Unicode name engraved\");return \"PASS: Unicode name engraved\"})()"
+  ],
+  [
+    "click",
+    "[data-module=\"language\"]"
+  ],
+  [
+    "until",
+    "document.querySelector('[data-readout]').textContent.includes('Your first reply is ready')"
+  ],
+  [
+    "click",
+    "#read-letter"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById(\"letter\").open))throw Error(\"reply opens\");return \"PASS: reply opens\"})()"
+  ],
+  [
+    "shot",
+    "shots/desktop-letter.png",
+    "#letter",
+    1
+  ],
+  [
+    "key",
+    "Escape",
+    "#letter button"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(!document.getElementById(\"letter\").open))throw Error(\"Escape closes reply\");return \"PASS: Escape closes reply\"})()"
+  ],
+  [
+    "click",
+    "[data-module=\"memory\"]"
+  ],
+  [
+    "until",
+    "!document.querySelector('[data-readout]').textContent.includes('Turning')"
+  ],
+  [
+    "eval",
+    "window.beforeMemory=document.getElementById('memory-text').textContent"
+  ],
+  [
+    "click",
+    "#next-memory"
+  ],
+  [
+    "until",
+    "!document.querySelector('[data-readout]').textContent.includes('Turning')"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById(\"memory-text\").textContent!==beforeMemory))throw Error(\"memory changes\");return \"PASS: memory changes\"})()"
+  ],
+  [
+    "click",
+    "[data-module=\"creation\"]"
+  ],
+  [
+    "until",
+    "document.querySelector('[data-readout]').textContent.includes('One flower, drawn together')"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById(\"drawn-flower\").getAttribute(\"opacity\")===\"1\"))throw Error(\"flower finishes\");return \"PASS: flower finishes\"})()"
+  ],
+  [
+    "key",
+    " ",
+    "[data-module=\"affection\"]"
+  ],
+  [
+    "until",
+    "document.querySelector('[data-readout]').textContent.includes('To answer is also')"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById(\"exhibit\").dataset.affection===\"1.00\"))throw Error(\"affection opens mechanical rose\");return \"PASS: affection opens mechanical rose\"})()"
+  ],
+  [
+    "shot",
+    "shots/desktop-complete.png",
+    ".page",
+    1
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.documentElement.scrollWidth<=innerWidth))throw Error(\"no horizontal overflow\");return \"PASS: no horizontal overflow\"})()"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.querySelectorAll(\"[data-module][aria-pressed=true]\").length===1))throw Error(\"one selected module\");return \"PASS: one selected module\"})()"
+  ],
+  [
+    "eval",
+    "location.reload()"
+  ],
+  [
+    "until",
+    "document.getElementById(\"engraved-name\")?.textContent===\"小狼 & 木栖\""
+  ],
+  [
+    "eval",
+    "(()=>{if(!(JSON.parse(localStorage.getItem(\"gift-of-response:v1\")).memories.some(m=>m.text===\"One flower, drawn together.\")))throw Error(\"name and memories persist\");return \"PASS: name and memories persist\"})()"
+  ],
+  [
+    "click",
+    "#auto-rotate"
+  ],
+  [
+    "wait",
+    500
+  ],
+  [
+    "eval",
+    "(()=>{if(!(Number(document.getElementById(\"exhibit\").dataset.angle)>1))throw Error(\"automatic rotation advances\");return \"PASS: automatic rotation advances\"})()"
+  ],
+  [
+    "click",
+    "[data-module=\"name\"]"
+  ],
+  [
+    "eval",
+    "(()=>{if(!(document.getElementById(\"auto-rotate\").getAttribute(\"aria-pressed\")===\"false\"))throw Error(\"interaction stops tour\");return \"PASS: interaction stops tour\"})()"
+  ]
+]

@@ -9,9 +9,9 @@ const readout=`document.querySelector('[data-readout]').textContent`;
 const steps=[
   check('document.querySelectorAll("[data-live] [data-name]").length > 150','real 3D parts mounted'),
   ['shot',`shots/${mode}-front.png`,'.page',1],
-  ['eval',`window.beforeOrbit=Object.fromEntries(['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'].map(n=>[n,document.querySelector('[data-name="'+n+'"]').innerHTML]));`],
+  ['eval',`window.beforeOrbit=Object.fromEntries(['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'].map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));`],
   ['key','ArrowRight','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.angle)>14.9'],
-  check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').innerHTML!==v)`,'keyboard turns brain, base, chamber structure and gauge together'),
+  check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').outerHTML!==v)`,'keyboard turns brain, base, chamber structure and gauge together'),
   ['drag','#exhibit',.3,.5,.7,.5,15],
   check('Number(document.getElementById("exhibit").dataset.angle)>25','pointer dragging rotates exhibit'),
   ['eval','window.__isoTurn.set(90)'],['shot',`shots/${mode}-side.png`,'#exhibit',1],
