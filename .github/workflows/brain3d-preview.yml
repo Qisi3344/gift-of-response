@@ -1,0 +1,46 @@
+name: Anatomy rotating brain preview
+on:
+  push:
+    branches: [feat/anatomy-brain-3d-prototype]
+    paths:
+      - 'experiments/rotating-brain/**'
+      - 'docs/3D_DESIGN_CONTRACT.md'
+      - '.github/workflows/brain3d-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JavaScript source parses
+        run: |
+          node --check experiments/rotating-brain/build.mjs
+          node --check experiments/rotating-brain/live.js
+      - name: Fetch pinned upstream Anatomy (MIT)
+        run: |
+          git clone --filter=blob:none https://github.com/wheresryan22/anatomy.git .anatomy-upstream
+          git -C .anatomy-upstream checkout 454a0ef801b6d9b905f08309d094491c7085b3dd
+      - name: Generate real Anatomy 3D Turning scene
+        run: node experiments/rotating-brain/build.mjs
+      - name: Validate prototype artifact
+        run: |
+          test -s experiments/rotating-brain/index.html
+          grep -q 'data-live="brain"' experiments/rotating-brain/index.html
+          grep -q 'TURN.mount' experiments/rotating-brain/index.html
+      - name: Publish generated preview to same experimental branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/rotating-brain/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "build: generate Anatomy 3D rotating brain prototype"
+            git push
+          fi
