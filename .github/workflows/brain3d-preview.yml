@@ -38,6 +38,11 @@ jobs:
           test -s experiments/rotating-brain/index.html
           grep -q 'data-live="brain"' experiments/rotating-brain/index.html
           grep -q 'TURN.mount' experiments/rotating-brain/index.html
+      - name: Install Chinese glyph support for visual QA
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk >/dev/null
+          fc-cache -f >/dev/null
       - name: Capture rendered front and back screenshots
         run: |
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
