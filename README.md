@@ -34,8 +34,8 @@ node scripts/check-browser.mjs reduced     # prefers-reduced-motion 验收
 
 ## 推送注意事项
 
-- 远程已配置：`origin → https://github.com/riki-aowu/gift-of-response.git`，发布分支为 `main`。
-- 推送使用 **riki-aowu** 账号。本机 `gh` 已保存该账号授权；默认 Git 凭据可能仍是 **Qisi3344**。使用对应账号的 GitHub CLI 凭据完成推送，无需删除 Windows 中其他账号的凭据。
+- 远程已配置：`origin → https://github.com/Qisi3344/gift-of-response.git`，发布分支为 `main`。
+- 本项目的正式仓库属于 **Qisi3344**，推送使用该账号。本机 `gh` 已保存该账号授权；推送前核对 `git remote -v` 指向上面的正式地址，避免误推到其他同名仓库。
 - `vendor/anatomy/turn.mjs` 里新增了一个半透明 `glass` 材质（rgba 色板），这是对上游 Anatomy 的本地修改；以后升级 vendor 时需要人工合并，不要直接覆盖。
 - `src/artwork/layers/*.svgfrag` 与 `src/runtime/scene-config.js` 中的 `cfg` 是 V0.2 遗留，当前构建管线不读取（仅 `moduleCopy` 文案仍在用）；清理前先确认引用。
 - `shots/*.png` 是验收截图产物，可随时用 `capture.mjs` / `check-browser.mjs` 重新生成。
