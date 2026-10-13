@@ -10,9 +10,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const WIDTH = 760, HEIGHT = 560;
 const AZIMUTH = 45, ELEVATION = 30;
 const P = k.fitProjection([
-  ...k.boxCorners({ x:-63, y:-60, w:126, d:120, r:5 }, -7, 0),
-  [-49,-42,40], [49,42,120], [-52,50,120], [52,-50,38],
-], WIDTH, HEIGHT, { pad:52, headroom:8, azimuth:AZIMUTH, elevation:ELEVATION });
+  ...k.boxCorners({ x:-49, y:-45, w:98, d:90, r:5 }, -7, 0),
+  [-42,-42,36], [42,42,112], [-45,45,112], [45,-45,36],
+], WIDTH, HEIGHT, { pad:45, headroom:8, azimuth:AZIMUTH, elevation:ELEVATION });
 const T = turning(P);
 const body = T.group("brain", {turn:{pivot:[0,0]}});
 const layer = T.layer("brain");
@@ -97,7 +97,7 @@ for(let i=0;i<3;i++){
 // Sample independent poses to precompute depth relationships in upstream beta.
 const poses=Array.from({length:25},(_,i)=>({brain:i*15}));
 const out=T.build({poses,statics:[],strict:false});
-const base=k.solidSvg(k.slabOf({x:-53,y:-48,w:106,d:96,r:8},-7,11,P,8,1.2),{tone:"mid"})+
+const base=k.solidSvg(k.slabOf({x:-44,y:-40,w:88,d:80,r:8},-7,11,P,8,1.2),{tone:"mid"})+
   k.solidSvg(k.cylinder(0,0,20,4,7,P,40),{tone:"mid"})+
   k.solidSvg(k.cylinder(0,0,12,11,8,P,40),{tone:"lo"})+
   k.solidSvg(k.cylinder(0,0,7,19,30,P,40),{tone:"mid"});
