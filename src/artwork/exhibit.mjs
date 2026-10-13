@@ -89,7 +89,7 @@ export function exhibit() {
     const point=(lat,lon)=>[cx+rx*Math.cos(lat)*Math.cos(lon),cy+ry*Math.cos(lat)*Math.sin(lon),cz+rz*Math.sin(lat)];
     for(let row=0;row<4;row++)for(let col=0;col<7;col++){
       if(row<=1&&col===5)continue;
-      const lat=-.75+row*.59,lon=(col+(row%2)*.23)*Math.PI*2/7;
+      const lat=-.75+row*.59,lon=Math.PI+(col+(row%2)*.23)*Math.PI*2/7;
       const c=point(lat,lon),n=[(c[0]-cx)/(rx*rx),(c[1]-cy)/(ry*ry),(c[2]-cz)/(rz*rz)],F=G.frameAlong(c,n);
       const polygon=[[-.265,-.40],[-.265,.40],[.265,.40],[.265,-.40]].map(([dl,da])=>{
         const q=point(lat+dl,lon+da).map((v,i)=>v-c[i]);return [q.reduce((v,x,i)=>v+x*F.u[i],0),q.reduce((v,x,i)=>v+x*F.v[i],0)];
@@ -98,8 +98,8 @@ export function exhibit() {
       T.prism({...base,name,F,polygon,round:.8,steps:3,s0:-.8,s1:0,bevel:.5,material:row===0&&col%3===0?'copper':'brass',details:{dots:[{at:[0,polygon[0][0]*.65,polygon[0][1]*.65],normal:[1,0,0],size:.45},{at:[0,polygon[2][0]*.65,polygon[2][1]*.65],normal:[1,0,0],size:.45}]}});
     }
     const top=T.ball({...base,name:`crown-lobe.${side}`,c:[cx,0,107],r:22,flats:[{n:[0,0,-1],d:-21}],material:'brass'});
-    const rear=T.round({...base,name:`cerebral-bearing.${side}`,F:G.frameOf([cx,0,105],[0,1,0],[1,0,0],[0,0,-1]),s0:-29,s1:-27,r:7,material:'steel',details:{bolts:[{s:-29,r:5,count:10,size:.6}]}});
-    face(rear,[cx,-29,105],[1,0,0],[0,0,1],'<circle r="4" fill="#252b29" stroke="#9b8151" stroke-width="1"/><circle r="1.7" fill="#baa7ce"/>',[0,-1,0]);
+    const rear=T.round({...base,name:`cerebral-bearing.${side}`,F:G.frameOf([cx,0,105],[0,-1,0],[1,0,0],[0,0,-1]),s0:-29,s1:-27,r:7,material:'steel',details:{bolts:[{s:-29,r:5,count:10,size:.6}]}});
+    face(rear,[cx,29,105],[1,0,0],[0,0,1],'<circle r="4" fill="#252b29" stroke="#9b8151" stroke-width="1"/><circle r="1.7" fill="#baa7ce"/>',[0,1,0]);
   }
   // Copper pressure circuit: straight pipes meet real elbow blocks and collars.
   for(const side of [-1,1]){
@@ -135,12 +135,12 @@ export function exhibit() {
   const drawing=box('drawing-desk',21,70,28,25,22,2,'brass');
   face(drawing,[21,70,30],[1,0,0],[0,1,0],'<rect x="-10" y="-9" width="20" height="18" fill="#d8caad"/><g id="drawn-flower" opacity="0" stroke="#75604a" fill="none" stroke-width=".65"><path d="M 0 7 V -1 M 0 4 Q -6 0 -5 -1 Q 0 -1 0 4 M 0 2 Q 5 -2 6 0 Q 4 4 0 2"/><g id="flower-petals"><circle cy="-4" r="2.8"/><circle cx="-2.8" cy="-1.3" r="2.8"/><circle cx="2.8" cy="-1.3" r="2.8"/></g></g>',[0,0,1]);
   for(const x of [7,35])rod(`drafting-pen.${x}`,[x,68,30],[x,68,43],.8,'steel');
-  const sensor=round('affection-sensor',0,24,36,7,1,'copper');
-  face(sensor,[0,24,37],[1,0,0],[0,1,0],'<path d="M 0 3 C -9 -2 -3 -7 0 -3 C 3 -7 9 -2 0 3" fill="none" stroke="#dfc48e" stroke-width=".7"/>',[0,0,1]);
-  rod('rose-stem',[0,24,37],[0,24,70],1.3,'steel');
-  round('rose-hub',0,24,70,5,3,'copper');
+  const sensor=round('affection-sensor',0,31,36,7,1,'copper');
+  face(sensor,[0,31,37],[1,0,0],[0,1,0],'<path d="M 0 3 C -9 -2 -3 -7 0 -3 C 3 -7 9 -2 0 3" fill="none" stroke="#dfc48e" stroke-width=".7"/>',[0,0,1]);
+  rod('rose-stem',[0,31,37],[0,31,50],1.3,'steel');
+  round('rose-hub',0,31,50,5,3,'copper');
   for(let i=0;i<6;i++){
-    const a=i*Math.PI/3,o=[5*Math.cos(a),24+5*Math.sin(a),73];
+    const a=i*Math.PI/3,o=[5*Math.cos(a),31+5*Math.sin(a),53];
     const group=T.group(`petal${i}`,{parent:scene,hinge:{point:o,axis:[-Math.sin(a),Math.cos(a),0],range:[-60,0]}});
     T.prism({...base,group,name:`rose-petal.${i}`,F:G.frameOf(o,[0,0,1],[Math.cos(a),Math.sin(a),0],[-Math.sin(a),Math.cos(a),0]),polygon:[[0,-1.3],[6,-2.6],[9,0],[6,2.6],[0,1.3]],s0:0,s1:.8,bevel:.25,material:'brass'});
   }
