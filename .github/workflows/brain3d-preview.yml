@@ -62,7 +62,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add experiments/rotating-brain/index.html experiments/rotating-brain/front.png experiments/rotating-brain/back.png experiments/rotating-brain/front.png.b64 experiments/rotating-brain/back.png.b64
+          git add experiments/rotating-brain/index.html experiments/rotating-brain/front.png experiments/rotating-brain/back.png experiments/rotating-brain/front.png.b64 experiments/rotating-brain/back.png.b64 experiments/rotating-brain/mobile.png experiments/rotating-brain/mobile.png.b64
           if ! git diff --cached --quiet; then
             git commit -m "build: generate Anatomy 3D rotating brain prototype"
             git push
