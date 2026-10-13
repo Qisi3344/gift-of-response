@@ -56,4 +56,6 @@ document.getElementById("reset").addEventListener("click",()=>{hold();target=0;r
 document.getElementById("half").addEventListener("click",()=>{hold();target+=180;run();});
 reduce.addEventListener("change",()=>{if(reduce.matches)hold();draw();run();});
 if("IntersectionObserver" in window) new IntersectionObserver(entries=>{visible=entries.at(-1).isIntersecting;if(visible)run();else if(frame){cancelAnimationFrame(frame);frame=0;}},{rootMargin:"120px 0px"}).observe(stage);
+const debugAngle=Number(new URLSearchParams(location.search).get("angle"));
+if(new URLSearchParams(location.search).has("angle") && Number.isFinite(debugAngle)) angle=target=debugAngle;
 draw();run();
