@@ -6,7 +6,8 @@
   const state = M.initialState(saved);
   let frame = 0, last = 0, visible = true;
   let previousReadout = '', lastLetterFocus = null;
-  const scene = Exhibit.mount(document.getElementById('exhibit'), () => { draw(); run(); });
+  const mechanics=typeof HeartMotion==='undefined'?null:HeartMotion.create();
+  const scene = Exhibit.mount(document.getElementById('exhibit'), () => { draw(); run(); },mechanics);
   const date = () => new Intl.DateTimeFormat('en-CA', {year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   function persist() {
     try { localStorage.setItem('gift-of-response:v1', JSON.stringify({ name: state.engraved, memories: state.memories })); }
@@ -31,10 +32,11 @@
     draw();
   }
   function trigger(module, value) {
+    if(mechanics&&(Object.keys(state.jobs).length||Math.abs(state.turn-state.targetTurn)>.001)){$('feedback').textContent='这一次回应正在完成，请稍候。';return;}
     if (state.selected !== module) select(module); else stopTour();
     if (module === 'name' && value === undefined) { $('name-input').focus(); return; }
-    if (!M.begin(state, module, value, reduced.matches)) return;
-    if (reduced.matches && module !== 'memory') completed(module);
+    if (!M.begin(state, module, value, reduced.matches||scene.isPaused())) return;
+    if ((reduced.matches||scene.isPaused()) && module !== 'memory') completed(module);
     draw(); run();
   }
   function draw() {
@@ -45,18 +47,20 @@
     const text = M.readout(state);
     if (text !== previousReadout) { document.querySelector('[data-readout]').textContent = text; previousReadout = text; }
     stage.dataset.selected = state.selected; stage.dataset.busy = String(Object.keys(state.jobs).length>0);
+    if(mechanics){const busy=Object.keys(state.jobs).length>0||Math.abs(state.turn-state.targetTurn)>.001;document.querySelectorAll('[data-module],#name-form button,#previous-memory,#next-memory').forEach(el=>el.disabled=busy);}
     for (const key of ['language','creation','affection']) document.querySelector(`[data-trigger="${key}"]`).disabled = state.jobs[key] !== undefined;
   }
   function tick(now) {
     frame = 0;
-    if (!visible || document.hidden) { last = 0; return; }
-    const dt = last ? Math.min((now-last)/1000,1/30) : 1/60; last = now;
-    for (const module of M.advance(state,dt,reduced.matches)) completed(module);
+    if ((!visible&&!Object.keys(state.jobs).length&&state.turn===state.targetTurn) || document.hidden) { last = 0; return; }
+    const dt = last ? Math.min((now-last)/1000,mechanics ? .1 : 1/30) : 1/60; last = now;
+    // Keep the event clock and mechanical clock together on slower frames.
+    for(let remaining=dt;remaining>1e-8;remaining-=1/30)for (const module of M.advance(state,scene.isPaused()?0:Math.min(remaining,1/30),reduced.matches)) completed(module);
     scene.advance(dt, reduced.matches);
     draw();
-    if (scene.moving() || Object.keys(state.jobs).length || state.turn !== state.targetTurn) run();
+    if (scene.moving() || (!scene.isPaused()&&(Object.keys(state.jobs).length || state.turn !== state.targetTurn))) run();
   }
-  function run() { if (!frame && visible && !document.hidden) frame = requestAnimationFrame(tick); }
+  function run() { if (!frame && (visible||Object.keys(state.jobs).length||state.turn!==state.targetTurn) && !document.hidden) frame = requestAnimationFrame(tick); }
   document.querySelectorAll('[data-module]').forEach(button=>button.addEventListener('click',()=>{
     const key=button.dataset.module; select(key);
     if(key==='name') $('name-input').focus(); else trigger(key);
@@ -80,7 +84,7 @@
   }
   $('read-letter').addEventListener('click',openLetter);
   $('letter').addEventListener('close',()=>lastLetterFocus?.focus());
-  new IntersectionObserver(entries=>{visible=entries.at(-1).isIntersecting;last=0;if(visible)run();else if(frame){cancelAnimationFrame(frame);frame=0;}},{rootMargin:'120px 0px'}).observe(stage);
+  new IntersectionObserver(entries=>{visible=entries.at(-1).isIntersecting;last=0;if(visible||Object.keys(state.jobs).length||state.turn!==state.targetTurn)run();else if(frame){cancelAnimationFrame(frame);frame=0;}},{rootMargin:'120px 0px'}).observe(stage);
   document.addEventListener('visibilitychange',()=>{last=0;if(!document.hidden)run();});
   reduced.addEventListener('change',()=>{for(const module of M.advance(state,0,reduced.matches))completed(module);draw();last=0;run();});
   scene.onAction = action => action === 'letter' ? openLetter() : trigger(action);

@@ -1,0 +1,31 @@
+eval: "PASS: real 3D parts mounted"
+eval: "PASS: glass and solid layers share the same screen projection"
+shot shots/heart-reduced-front.png · readout "A name is a beginning. · 从一个名字开始"
+eval: "PASS: full glass dome covers both halves at four rotation angles"
+eval: true
+eval: "PASS: keyboard turns specimen, base, chamber structure and gauge together"
+eval: "PASS: pointer dragging rotates exhibit"
+eval: undefined
+shot shots/heart-reduced-side.png · readout "A name is a beginning. · 从一个名字开始"
+eval: undefined
+shot shots/heart-reduced-rear.png · readout "A name is a beginning. · 从一个名字开始"
+eval: undefined
+shot shots/heart-reduced-opposite.png · readout "A name is a beginning. · 从一个名字开始"
+eval: "小狼 & 木栖"
+eval: "PASS: Unicode name engraved"
+eval: "PASS: reply opens"
+shot shots/heart-reduced-letter.png · readout ""
+eval: "PASS: Escape closes reply"
+eval: "A place for our words to return."
+eval: "PASS: memory changes"
+eval: "PASS: flower finishes"
+eval: "PASS: affection opens mechanical rose"
+shot shots/heart-reduced-complete.png · readout "To answer is also a form of staying. · 回应，本身也是一种陪伴。"
+eval: "PASS: no horizontal overflow"
+eval: "PASS: one selected module"
+eval: undefined
+eval: "PASS: name and memories persist"
+eval: "PASS: reduced motion disables automatic rotation"
+eval: true
+eval: "PASS: reduced motion stops idle and steam"
+console: clean

@@ -507,6 +507,7 @@ async function main() {
   const page = await browser(target, options);
   const labelOf = (state, index) => (typeof state === "number" ? `${state.toFixed(3)}°` : `state ${index}`);
   try {
+    if(argv.includes('--pause'))await page.evaluate('document.getElementById("pause-motion")?.click()');
     const info = await page.evaluate(HELPERS);
     console.log(`page ${info.W}×${info.H} · live layers ${info.layers.filter(Boolean).join(", ")} · theme ${info.theme}`);
     await page.evaluate(`window.__isoTurn.set(0) && 0`);

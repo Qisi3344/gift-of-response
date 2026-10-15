@@ -1,0 +1,28 @@
+separation: 0
+unseparated: 0
+cycles: 0
+forced: 0
+swaps: 0
+layers: 0
+rigid: 0
+swept: skipped
+posed: 0
+folds: 0
+self: 0
+crowding: 0
+endon: 0
+coverage: skipped
+depth: 0
+continuity: skipped
+order changes: 308 states with swaps · 543 order states · 123 posed states · 7175 planes (tightest margin 0.000) · depth oracle 10 states, 20014 overlapping pairs
+  sweep at 41.000: 5885 pairs reorder (lower-clamp.10 / lower-clamp.18; lower-clamp.9 / lower-clamp.18; glass-wall.8 / glass-wall.9; glass-wall.8 / glass-wall.9.2)
+  sweep at 193.000: 3795 pairs reorder (crank-tooth.2 / crank-tooth.3; pillar-cap.0 / apex-bearing; pillar-cap.0 / heart-support; pillar-cap.0 / apex-cradle.-12.6)
+  sweep at 183.000: 3011 pairs reorder (drafting-foot.0 / drafting-pen.0; drafting-rail.0 / drafting-pen.0; printer / drafting-pen.0; language-paper / drafting-pen.0)
+  sweep at 154.000: 2848 pairs reorder (lower-clamp.13 / heart-support; lower-clamp.13 / apex-cradle.-12.6; lower-clamp.13 / apex-cradle.-7.4; lower-clamp.14 / heart-support)
+  sweep at 42.000: 2566 pairs reorder (plinth / nameplate; plinth / engraving-bracket.-26; plinth / engraving-bracket.26; plinth / name-stylus)
+  sweep at 178.000: 2196 pairs reorder (printer / drawing-desk; printer / drafting-foot.0; printer / drafting-foot.1; printer / drafting-rail.1)
+  sweep at 304.000: 1668 pairs reorder (lower-clamp.18 / heart-support; lower-clamp.18 / apex-cradle.-12.6; lower-clamp.18 / apex-cradle.-7.4; lower-clamp.19 / heart-support)
+  sweep at 229.000: 1651 pairs reorder (deck-bolt.-73.75 / telegraph-frame.-43; deck-bolt.-73.75 / telegraph-back; pump-foot.65 / telegraph-frame.-43; pump-foot.65 / telegraph-back)
+  sweep at 177.000: 1614 pairs reorder (lower-clamp.2 / lower-clamp.3; lower-clamp.2 / lower-clamp.4; lower-clamp.2 / lower-clamp.5; lower-clamp.2 / lower-clamp.6)
+  sweep at 143.000: 1566 pairs reorder (right-support / left-atrium; right-support / aortic-neck; right-support / aortic-flange; right-support / venous-neck)
+turn audit · 122.74 s

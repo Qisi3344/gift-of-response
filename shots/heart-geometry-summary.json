@@ -1,0 +1,32 @@
+{
+  "generatedFrom": "heart-geometry.log",
+  "quick": true,
+  "skipped": [
+    "swept",
+    "coverage",
+    "continuity"
+  ],
+  "checks": {
+    "separation": 0,
+    "unseparated": 0,
+    "cycles": 0,
+    "forced": 0,
+    "swaps": 0,
+    "layers": 0,
+    "rigid": 0,
+    "posed": 0,
+    "folds": 0,
+    "self": 0,
+    "crowding": 0,
+    "endon": 0,
+    "depth": 0
+  },
+  "failures": 0,
+  "stats": {
+    "orderStates": 543,
+    "posedStates": 123,
+    "depthStates": 10,
+    "depthPairs": 20014,
+    "planes": 7175
+  }
+}

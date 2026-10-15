@@ -1,8 +1,9 @@
 const Exhibit = (() => {
-  function mount(stage, invalidate) {
+  function mount(stage, invalidate, mechanics=null) {
     const $ = id => document.getElementById(id), reduced = matchMedia('(prefers-reduced-motion: reduce)');
     let angle=0,target=0,painted='',auto=false,drag=null,suppress=false;
     const controller=TURN.mount(stage,exhibitData,{onHold:()=>stop()});
+    mechanics?.attach(stage,controller);
     const normalAngle=n=>((n%360)+360)%360;
     const actions={'nameplate':'name','language-key':'language','language-paper':'letter','memory-drum':'memory','drawing-desk':'creation','affection-sensor':'affection'};
     for(const [name,action] of Object.entries(actions)) {
@@ -46,18 +47,19 @@ const Exhibit = (() => {
       stage.querySelector('.glass-front').innerHTML=`${streaks}${lid}`;
     }
     function render(state){
-      const stamp=[angle,state.progress.language,state.progress.affection,state.turn].join(':');
-      if(stamp!==painted){
-        const warmth=M.ease(state.progress.affection);
-        controller.set({exhibit:angle,paper:M.ease(state.progress.language),memory:{R:TURN.rotation([1,0,0],state.turn*60)},governor:state.progress.language*360,...Object.fromEntries(Array.from({length:6},(_,i)=>[`petal${i}`,-60*(1-warmth)]))});
+      const warmth=M.ease(state.progress.affection);
+      const values=mechanics?mechanics.values(state,angle):{exhibit:angle,paper:M.ease(state.progress.language),memory:{R:TURN.rotation([1,0,0],state.turn*60)},governor:state.progress.language*360,...Object.fromEntries(Array.from({length:6},(_,i)=>[`petal${i}`,-60*(1-warmth)]))};
+      const stamp=mechanics?JSON.stringify(values):[angle,state.progress.language,state.progress.affection,state.turn].join(':');
+      if(stamp!==painted){controller.set(values);
         painted=stamp;glass();$('orbit-angle').textContent=`${Math.round(normalAngle(angle)).toString().padStart(3,'0')}°`;stage.dataset.angle=normalAngle(angle).toFixed(2);}
-      const name=$('engraved-name');name.textContent=state.engraved||'THE GIFT OF RESPONSE';
+      const name=$('engraved-name');name.textContent=(mechanics?mechanics.nameText(state):state.engraved)||'THE GIFT OF RESPONSE';
       name.setAttribute('font-size',String(Math.min(3.2,54/Math.max(1,Array.from(name.textContent).length))));
       const ink=$('drawn-flower');ink.setAttribute('opacity',String(M.ease(state.progress.creation)));ink.style.strokeDasharray='100';ink.style.strokeDashoffset=String(100*(1-state.progress.creation));
-      const warmth=M.ease(state.progress.affection);stage.style.setProperty('--core-opacity',String(.35+.65*warmth));stage.dataset.affection=warmth.toFixed(2);
-      stage.querySelector('[data-name="language-paper"]').style.opacity=String(M.clamp(state.progress.language*3));
+      stage.style.setProperty('--core-opacity',String(.35+.65*warmth));stage.dataset.affection=warmth.toFixed(2);
+      stage.querySelector('[data-name="language-paper"]').style.opacity=String(M.clamp((mechanics?mechanics.paperProgress(state):state.progress.language)*3));
       stage.querySelector('[data-name="language-paper"]').style.pointerEvents=state.progress.language===1?'auto':'none';
-      stage.querySelector('[data-name="language-key"]').style.filter=state.jobs.language!==undefined?'brightness(1.5)':'';
+      stage.querySelector('[data-name="language-key"]').style.filter=state.jobs.language!==undefined?'brightness(1.15)':'';
+      mechanics?.paint(state);
     }
     stage.addEventListener('pointerdown',e=>{if(e.button!==0||!e.isPrimary)return;stop();suppress=false;drag={id:e.pointerId,x:e.clientX,start:target,action:e.target.closest('[data-action]')?.dataset.action};stage.setPointerCapture(e.pointerId);});
     stage.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>5)suppress=true;if(suppress){target=drag.start+dx*.45;angle=target;invalidate();}});
@@ -67,10 +69,11 @@ const Exhibit = (() => {
     $('rotate-left').addEventListener('click',()=>move(-45));$('rotate-right').addEventListener('click',()=>move(45));
     $('reset-view').addEventListener('click',()=>{stop();target=0;if(reduced.matches)angle=0;invalidate();});
     $('auto-rotate').addEventListener('click',()=>{if(reduced.matches)return;auto=!auto;$('auto-rotate').setAttribute('aria-pressed',String(auto));invalidate();});
-    function motionPreference(){if(reduced.matches){stop();angle=target;}$('auto-rotate').disabled=reduced.matches;}
+    function motionPreference(){mechanics?.advance(0,reduced.matches);if(reduced.matches){stop();angle=target;}$('auto-rotate').disabled=reduced.matches;}
     reduced.addEventListener('change',()=>{motionPreference();invalidate();});motionPreference();
-    const api={controller,render,stop,onAction:null,moving:()=>auto||Math.abs(target-angle)>.02,
-      advance(dt,calm){if(auto&&!calm)target+=dt*7;angle=calm?target:angle+(target-angle)*(1-Math.exp(-dt/.1));if(Math.abs(target-angle)<.02)angle=target;},
+    $('pause-motion')?.addEventListener('click',()=>{stop();const paused=!mechanics.isPaused();mechanics.setPaused(paused);$('pause-motion').setAttribute('aria-pressed',String(paused));$('pause-motion').textContent=paused?'继续运转':'暂停动态';invalidate();});
+    const api={controller,render,stop,onAction:null,moving:()=>auto||Math.abs(target-angle)>.02||!!mechanics?.moving(),isPaused:()=>!!mechanics?.isPaused(),
+      advance(dt,calm){mechanics?.advance(dt,calm);if(auto&&!calm)target+=dt*7;angle=calm?target:angle+(target-angle)*(1-Math.exp(-dt/.1));if(Math.abs(target-angle)<.02)angle=target;},
       set(value){stop();angle=target=value;invalidate();},get:()=>angle};
     window.__isoTurn.set=value=>api.set(typeof value==='number'?value:value.exhibit);window.__isoTurn.get=()=>({exhibit:angle});
     return api;

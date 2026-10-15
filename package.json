@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:heart": "node scripts/build.mjs --heart",
+    "test:heart": "node scripts/build.mjs --heart --check && node scripts/test-heart.mjs",
     "check": "node scripts/build.mjs --check",
     "test": "node scripts/test.mjs"
   }

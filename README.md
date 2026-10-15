@@ -10,6 +10,27 @@
 
 ## 开发
 
+V0.3 心脏实验保留在独立分支 `codex/v03-mechanical-heart`。打开
+[心脏预览](./experiments/heart-v03/index.html)；根目录仍是机械脑，历史快照在
+[brain-v02](./experiments/brain-v02/index.html)。此实验不自动替换正式版本。
+
+```bash
+npm run build:heart
+npm run test:heart
+node scripts/audit-heart.mjs
+node scripts/check-browser.mjs desktop --heart
+node scripts/check-browser.mjs phone --heart
+node scripts/check-browser.mjs reduced --heart
+```
+
+心脏几何、共享机械节拍和蒸汽分别位于 `src/artwork/heart.mjs`、
+`src/runtime/heart-motion.js`、`src/runtime/steam.js`。浏览器检查包括五模块、
+旧记录、鼠标/键盘/真实触摸事件、暂停续播、错峰排汽和世界坐标。
+几何审计非零即未通过，不能仅凭截图判断；详细结果见 `shots/heart-geometry.log`。
+
+本分支也修正了 Anatomy 构建器的曲面抽样与深度平面验证，以及细棱柱的
+投影包围轮廓。升级 vendor 时须保留这些修改。
+
 本项目的 **源代码已模块化**，但发布仍然是一个可离线打开的独立 HTML。**不要直接编辑 index.html**。
 
 ```bash

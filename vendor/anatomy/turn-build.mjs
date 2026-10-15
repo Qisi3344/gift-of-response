@@ -285,9 +285,17 @@ function hull2(points) {
 
 function thinCloud(points, most = 64) {
   if (points.length <= most) return points;
-  const out = [];
-  const step = points.length / most;
-  for (let i = 0; i < most; i++) out.push(points[Math.floor(i * step)]);
+  // Regular strides can select the same longitude on every lathe ring.
+  // Keep directional extrema so reduced clouds still span the solid's volume.
+  const selected=new Set();
+  for(const x of [-1,0,1])for(const y of [-1,0,1])for(const z of [-1,0,1]){
+    if(!x&&!y&&!z)continue;let best=0;
+    for(let i=1;i<points.length;i++)if(dot3(points[i],[x,y,z])>dot3(points[best],[x,y,z]))best=i;
+    selected.add(best);
+  }
+  const out=[...selected].slice(0,most).map(i=>points[i]);
+  const distances=points.map(p=>Math.min(...out.map(q=>dot3(sub3(p,q),sub3(p,q)))));
+  while(out.length<most){let best=0;for(let i=1;i<distances.length;i++)if(distances[i]>distances[best])best=i;out.push(points[best]);for(let i=0;i<distances.length;i++){const d=sub3(points[i],points[best]);distances[i]=Math.min(distances[i],dot3(d,d));}}
   return out;
 }
 
@@ -1143,6 +1151,19 @@ function build(T, { statics = [], verify = false, poses = null, strict = true, f
     cloudCache.set(key, out);
     return out;
   };
+  const validFramePlane=(partsA,partsB,frame,n)=>{
+    const extent=(parts,maximum)=>{
+      let bound=maximum?-Infinity:Infinity;
+      for(const cams of sampleStates()){
+        const f=frame?cams[frame.index]:cams.world,R=f.R;
+        const w=[R[0]*n[0]+R[1]*n[1]+R[2]*n[2],R[3]*n[0]+R[4]*n[1]+R[5]*n[2],R[6]*n[0]+R[7]*n[1]+R[8]*n[2]];
+        for(const part of parts){const c=part.group?cams[part.group.index]:cams.world;
+          for(const q of part.samples){const p=[c.R[0]*q[0]+c.R[1]*q[1]+c.R[2]*q[2]+c.t[0]-f.t[0],c.R[3]*q[0]+c.R[4]*q[1]+c.R[5]*q[2]+c.t[1]-f.t[1],c.R[6]*q[0]+c.R[7]*q[1]+c.R[8]*q[2]+c.t[2]-f.t[2]],v=dot3(w,p);bound=maximum?Math.max(bound,v):Math.min(bound,v);}
+        }
+      }return bound;
+    };
+    return extent(partsB,false)-extent(partsA,true)>=-1e-6;
+  };
   const skip = {};
   const problems = [];
   const margins = [];
@@ -1175,7 +1196,7 @@ function build(T, { statics = [], verify = false, poses = null, strict = true, f
           const ca = A.flatMap((part) => framedCloud(part, common).filter((_, i) => fullClouds || i % 2 === 0));
           const cb = B.flatMap((part) => framedCloud(part, common).filter((_, i) => fullClouds || i % 2 === 0));
           const hit = quickSeparate(ca, cb, [[0, 0, 1], ...A.flatMap((part) => part.hints).slice(0, 6).map((h) => toFrame(h, ga, common)), ...B.flatMap((part) => part.hints).slice(0, 6).map((h) => toFrame(h, gb, common))]);
-          if (hit.margin < 0.1) continue;
+          if (hit.margin < 0.1||!validFramePlane(A,B,common,hit.n)) continue;
           pairsOfGroups.push(keys[x], keys[y], common ? common.index : -1, hit.n[0], hit.n[1], hit.n[2]);
           settled.add(`${keys[x]}|${keys[y]}`);
           settled.add(`${keys[y]}|${keys[x]}`);
@@ -1219,7 +1240,7 @@ function build(T, { statics = [], verify = false, poses = null, strict = true, f
           const ca = framedCloud(a, common);
           const cb = framedCloud(b, common);
           const hit = quickSeparate(ca, cb, [[0, 0, 1], ...a.hints, ...b.hints].map((h) => toFrame(h, a.group, common)).concat([[0, 0, 1], ...b.hints.map((h) => toFrame(h, b.group, common))]));
-          if (hit.margin >= 0.1) {
+          if (hit.margin >= 0.1&&validFramePlane([a],[b],common,hit.n)) {
             framed.push(a.id, b.id, common ? common.index : -1, hit.n[0], hit.n[1], hit.n[2]);
             framedCount++;
           } else dyn.push(a.id, b.id);

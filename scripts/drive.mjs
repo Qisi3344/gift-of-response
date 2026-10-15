@@ -105,7 +105,7 @@ async function main() {
   }
   const [target, script] = rest;
   const actions = options.actions ?? JSON.parse(script ?? "[]");
-  const kinds = new Set(["scroll", "wait", "move", "click", "drag", "key", "slow", "until", "eval", "shot", "lines", "turn", "orbit", "sheet"]);
+  const kinds = new Set(["scroll", "wait", "move", "click", "drag", "touchdrag", "key", "slow", "until", "eval", "shot", "lines", "turn", "orbit", "sheet"]);
   if (!Array.isArray(actions)) throw new Error("actions must be an array");
   for (const action of actions) {
     if (!Array.isArray(action) || !kinds.has(action[0])) throw new Error(`unknown action ${Array.isArray(action) ? action[0] : action}`);
@@ -223,6 +223,13 @@ async function main() {
         }
         await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: to[0], y: to[1], button: "left", buttons: 0, clickCount: 1 });
         mouse = to;
+      } else if (kind === "touchdrag") {
+        const box=await boxOf(args[0]),steps=args[5]??15;
+        const point=t=>({x:box.x+box.w*(args[1]+(args[3]-args[1])*t),y:box.y+box.h*(args[2]+(args[4]-args[2])*t),id:1});
+        await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+        await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[point(0)]});
+        for(let i=1;i<=steps;i++){await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[point(i/steps)]});await sleep(16);}
+        await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
       } else if (kind === "key") {
         await evaluate(`(()=>{const el=${targetOf(args[1], '[tabindex="0"]')};if(el)el.focus()})()`);
         const key = args[0];

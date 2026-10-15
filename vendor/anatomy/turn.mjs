@@ -664,7 +664,11 @@ function t3EmitPrism(run, cam, f) {
     f.d[run.role.edge] = t3Broken(sil, count, flags);
   } else f.d[run.role.edge] = outline;
   t3Box(sil, count, f.box);
-  t3SetHull(f, sil, count);
+  // Face fills may extend beyond the stitched outline at thin rounded corners.
+  // Occlusion must enclose both complete rings, not just that outline.
+  const bounds=t3Hull(Array.from({length:2*n},(_,j)=>{const buf=j<n?bot:top,i=j%n;return [buf[2*i],buf[2*i+1]];}));
+  t3HullOut(f,bounds,bounds.length);
+  t3Box(f.hull,f.hullN,f.box);
   const quad = new Float64Array(8);
   for (let i = 0; i < n; i++) {
     const role = run.role[`f${i}`];

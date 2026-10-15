@@ -1,7 +1,7 @@
 import {spawnSync} from 'node:child_process';
 import {writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const mode=process.argv[2]||'desktop',phone=mode==='phone',reduced=mode==='reduced';
+const profile=process.argv[2]||'desktop',phone=profile==='phone',reduced=profile==='reduced',heart=process.argv.includes('--heart'),mode=(heart?'heart-':'')+profile;
 const chrome=[process.env.CHROME_PATH,'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(p=>p&&existsSync(p));
 assert(chrome,'Set CHROME_PATH');mkdirSync('shots',{recursive:true});
 const check=(js,message)=>['eval',`(()=>{if(!(${js}))throw Error(${JSON.stringify(message)});return ${JSON.stringify('PASS: '+message)}})()`];
@@ -30,9 +30,9 @@ const steps=[
     }
     window.__isoTurn.set(0);return true;
   })()`,'full glass dome covers both halves at four rotation angles'),
-  ['eval',`window.beforeOrbit=Object.fromEntries(['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'].map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));`],
+  ['eval',`window.beforeOrbit=Object.fromEntries(${JSON.stringify(heart?['plinth','heart-left-ventricle','pillar.0','pressure-gauge']:['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'])}.map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));true;`],
   ['key','ArrowRight','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.angle)>14.9'],
-  check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').outerHTML!==v)`,'keyboard turns brain, base, chamber structure and gauge together'),
+  check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').outerHTML!==v)`,'keyboard turns specimen, base, chamber structure and gauge together'),
   ['drag','#exhibit',.3,.5,.7,.5,15],
   check('Number(document.getElementById("exhibit").dataset.angle)>25','pointer dragging rotates exhibit'),
   ['eval','window.__isoTurn.set(90)'],['shot',`shots/${mode}-side.png`,'#exhibit',1],
@@ -60,6 +60,24 @@ const steps=[
 if(reduced)steps.push(check('document.getElementById("auto-rotate").disabled','reduced motion disables automatic rotation'));
 else steps.push(['click','#auto-rotate'],['wait',500],check('Number(document.getElementById("exhibit").dataset.angle)>1','automatic rotation advances'),['click','[data-module="name"]'],check('document.getElementById("auto-rotate").getAttribute("aria-pressed")==="false"','interaction stops tour'));
 writeFileSync(`shots/${mode}-actions.json`,JSON.stringify(steps,null,2));
-const result=spawnSync(process.execPath,['scripts/drive.mjs','index.html','--actions',`shots/${mode}-actions.json`,'--width',phone?'390':'1440','--height',phone?'1100':'1500',...(reduced?['--reduced']:[])],{encoding:'utf8',env:{...process.env,CHROME_PATH:chrome},windowsHide:true});
+if(heart){
+  if(phone)steps.push(['scroll','#exhibit'],['turn',0],['touchdrag','#exhibit',.3,.5,.7,.5,15],check('Number(document.getElementById("exhibit").dataset.angle)>20','real touch drag rotates without triggering a module'));
+  if(reduced)steps.push(['eval','window.frozenPhase=document.getElementById("exhibit").dataset.heartPhase;true'],['wait',400],check('document.getElementById("exhibit").dataset.heartPhase===frozenPhase&&document.querySelector(".steam-layer").dataset.count==="0"','reduced motion stops idle and steam'));
+  else steps.push(
+    ['click','[data-module="affection"]'],['scroll','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.eventTime)>1.2'],
+    ['eval','document.querySelector("[data-trigger=language]").click();true'],check('document.getElementById("exhibit").dataset.mechanicalEvent==="affection"&&document.querySelector("[data-module=language]").disabled','overlapping triggers cannot replace an active response'),
+    ['click','#pause-motion'],['eval','window.frozenPhase=document.getElementById("exhibit").dataset.heartPhase;window.frozenEvent=document.getElementById("exhibit").dataset.eventTime;true'],['wait',400],
+    check('document.getElementById("exhibit").dataset.heartPhase===frozenPhase&&document.getElementById("exhibit").dataset.eventTime===frozenEvent','pause freezes the active event'),
+    ['key','ArrowRight','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.angle)>14.9'],check('document.getElementById("exhibit").dataset.heartPhase===frozenPhase','orbit remains independent of paused mechanics'),
+    ['click','#pause-motion'],['until','Number(document.getElementById("exhibit").dataset.eventTime)>4.8'],['slow',0],
+    check('document.querySelector(".steam-layer [data-port=left]")&&document.querySelector(".steam-layer [data-port=right]")','affection produces staggered steam at both real ports'),
+    ['eval','window.puffBefore=document.querySelector(".steam-layer ellipse").dataset.world;true'],['turn',70],check('document.querySelector(".steam-layer ellipse").dataset.world===puffBefore','emitted steam remains in world space during orbit'),
+    ['shot',`shots/${mode}-heart-response.png`,'#exhibit',1],['slow',1],['until',`${readout}.includes('To answer is also')`],
+    check('document.getElementById("engraved-name").textContent==="小狼 & 木栖"','another response keeps the engraved name'),
+    ['click','#pause-motion'],['orbit',`shots/${mode}-heart-orbit.png`,0,315,45,'#exhibit',1,null,4],['turn',0]
+  );
+  writeFileSync(`shots/${mode}-actions.json`,JSON.stringify(steps,null,2));
+}
+const result=spawnSync(process.execPath,['scripts/drive.mjs',heart?'experiments/heart-v03/index.html':'index.html','--actions',`shots/${mode}-actions.json`,'--width',phone?'390':'1440','--height',phone?'1100':'1500',...(reduced?['--reduced']:[])],{encoding:'utf8',env:{...process.env,CHROME_PATH:chrome},windowsHide:true});
 writeFileSync(`shots/${mode}-checks.log`,result.stdout+result.stderr);console.log(result.stdout);console.error(result.stderr);
 assert.equal(result.status,0);assert(result.stdout.includes('console: clean'));

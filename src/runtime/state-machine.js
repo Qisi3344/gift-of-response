@@ -47,7 +47,7 @@ function remember(state, text, date) {
 function readout(state) {
   const id = state.selected, p = state.progress[id];
   if (id === 'memory') {
-    if (Math.abs(state.turn - state.targetTurn) > .01) return 'Turning the drum… · 翻阅中';
+    if (Math.abs(state.turn - state.targetTurn) > .001) return 'Turning the drum… · 翻阅中';
     const m = state.memories[memoryIndex(state.turn, state.memories.length)];
     return `${m.date} — ${m.text}`;
   }
