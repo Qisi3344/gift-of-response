@@ -10,17 +10,19 @@
 
 ## 开发
 
-V0.3 心脏实验保留在独立分支 `codex/v03-mechanical-heart`。打开
-[心脏预览](./experiments/heart-v03/index.html)；根目录仍是机械脑，历史快照在
-[brain-v02](./experiments/brain-v02/index.html)。此实验不自动替换正式版本。
+当前默认版本为 **V0.3 蒸汽机械心脏**，直接打开根目录的 [index.html](./index.html)。
+机械脑已从活动代码和页面中移除，完整旧版页面、源码、构建脚本与绘图依赖
+收在 [备份.zip](./备份.zip)（约 617 KiB）。需要查看旧版时，解压后打开其中的
+`index.html`；需要开发旧版时，在解压目录运行 `npm run build`。
 
 ```bash
-npm run build:heart
+npm run build
+npm test
 npm run test:heart
 node scripts/audit-heart.mjs
-node scripts/check-browser.mjs desktop --heart
-node scripts/check-browser.mjs phone --heart
-node scripts/check-browser.mjs reduced --heart
+node scripts/check-browser.mjs desktop
+node scripts/check-browser.mjs phone
+node scripts/check-browser.mjs reduced
 ```
 
 心脏几何、共享机械节拍和蒸汽分别位于 `src/artwork/heart.mjs`、
@@ -58,7 +60,7 @@ node scripts/check-browser.mjs reduced     # prefers-reduced-motion 验收
 - 远程已配置：`origin → https://github.com/Qisi3344/gift-of-response.git`，发布分支为 `main`。
 - 本项目的正式仓库属于 **Qisi3344**，推送使用该账号。本机 `gh` 已保存该账号授权；推送前核对 `git remote -v` 指向上面的正式地址，避免误推到其他同名仓库。
 - `vendor/anatomy/turn.mjs` 里新增了一个半透明 `glass` 材质（rgba 色板），这是对上游 Anatomy 的本地修改；以后升级 vendor 时需要人工合并，不要直接覆盖。
-- `src/artwork/layers/*.svgfrag` 与 `src/runtime/scene-config.js` 中的 `cfg` 是 V0.2 遗留，当前构建管线不读取（仅 `moduleCopy` 文案仍在用）；清理前先确认引用。
+- `src/artwork/heart.mjs` 是唯一展品几何；`scene-config.js` 仅保存五模块文案。机械脑与旧 SVG 图层均在 `备份.zip` 中，不再参与构建。
 - `shots/*.png` 是验收截图产物，可随时用 `capture.mjs` / `check-browser.mjs` 重新生成。
 
 ## 鸣谢

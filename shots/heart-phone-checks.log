@@ -36,7 +36,7 @@ eval: "PASS: orbit remains independent of paused mechanics"
 eval: "PASS: affection produces staggered steam at both real ports"
 eval: true
 eval: "PASS: emitted steam remains in world space during orbit"
-shot shots/heart-phone-heart-response.png · readout "Opening · 68%"
+shot shots/heart-phone-heart-response.png · readout "Opening · 69%"
 eval: "PASS: another response keeps the engraved name"
 orbit shots/heart-phone-heart-orbit.png · 8 frames 0°…315° every 45°
 console: clean

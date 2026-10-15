@@ -1,8 +1,8 @@
 # V0.3 心脏实验交付
 
-独立分支 `codex/v03-mechanical-heart`；预览为 `experiments/heart-v03/index.html`。
-根目录继续展示机械脑，原始 HTML 在 `experiments/brain-v02/index.html` 完整保存，
-已比对其与分支起点的文件一致。尚未合并或替换正式页面，等待视觉验收。
+按用户决定，默认页面 `index.html` 现在展示机械心脏。
+机械脑已归档为根目录 `备份.zip`，包含完整旧版页面、源码、构建脚本和依赖。
+已校验压缩包 CRC 和旧版页面内容；旧展品与实验页面不再留在活动目录。
 
 新增倾斜尖端的主心室、较短的前侧心室、不等大的心房、大血管式拱形总管、
 三片铰接检修瓣、少量淡紫核心光。材质改为纸白背景、银钢心室、铜管与黄铜固定件。
@@ -44,7 +44,7 @@ node scripts/check-browser.mjs reduced --heart
 性能可用以下命令复现，输出包含原始三轮测量，不将电脑模拟结果当作真机成绩：
 
 ```sh
-node scripts/turn-check.mjs experiments/heart-v03/index.html --perf --pause --width 390 --height 1100 --scale 1 --out shots/heart-perf
+node scripts/turn-check.mjs index.html --perf --pause --width 390 --height 1100 --scale 1 --out shots/heart-perf
 ```
 
 本机 Edge、390px、DPR 1、未限速，三轮各 240 帧的旋转基准：

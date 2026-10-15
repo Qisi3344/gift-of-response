@@ -19,7 +19,7 @@
   ],
   [
     "eval",
-    "window.beforeOrbit=Object.fromEntries([\"plinth\",\"heart-left-ventricle\",\"pillar.0\",\"pressure-gauge\"].map(n=>[n,document.querySelector('[data-name=\"'+n+'\"]').outerHTML]));true;"
+    "window.beforeOrbit=Object.fromEntries(['plinth','heart-left-ventricle','pillar.0','pressure-gauge'].map(n=>[n,document.querySelector('[data-name=\"'+n+'\"]').outerHTML]));true;"
   ],
   [
     "key",

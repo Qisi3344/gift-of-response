@@ -1,7 +1,7 @@
 # V0.3 mechanical heart — construction reference
 
-An independent experiment on `codex/v03-mechanical-heart`. The preceding brain
-prototype is retained at `experiments/brain-v02/index.html` and `src/artwork/exhibit.mjs`.
+The default exhibit is now the mechanical heart at `index.html`.
+The preceding brain page, geometry and buildable source are archived in `备份.zip`.
 
 The heart is an asymmetric pump: a dominant tapered left ventricle ends in a
 left-offset apex; a shorter right pumping chamber and two unequal atrial housings

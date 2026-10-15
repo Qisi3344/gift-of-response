@@ -1,7 +1,7 @@
 import {spawnSync} from 'node:child_process';
 import {writeFileSync,mkdirSync,existsSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const profile=process.argv[2]||'desktop',phone=profile==='phone',reduced=profile==='reduced',heart=process.argv.includes('--heart'),mode=(heart?'heart-':'')+profile;
+const profile=process.argv[2]||'desktop',phone=profile==='phone',reduced=profile==='reduced',mode='heart-'+profile;
 const chrome=[process.env.CHROME_PATH,'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(p=>p&&existsSync(p));
 assert(chrome,'Set CHROME_PATH');mkdirSync('shots',{recursive:true});
 const check=(js,message)=>['eval',`(()=>{if(!(${js}))throw Error(${JSON.stringify(message)});return ${JSON.stringify('PASS: '+message)}})()`];
@@ -30,7 +30,7 @@ const steps=[
     }
     window.__isoTurn.set(0);return true;
   })()`,'full glass dome covers both halves at four rotation angles'),
-  ['eval',`window.beforeOrbit=Object.fromEntries(${JSON.stringify(heart?['plinth','heart-left-ventricle','pillar.0','pressure-gauge']:['plinth','lobe.-1.1.1','pillar.0','pressure-gauge.1'])}.map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));true;`],
+  ['eval',`window.beforeOrbit=Object.fromEntries(['plinth','heart-left-ventricle','pillar.0','pressure-gauge'].map(n=>[n,document.querySelector('[data-name="'+n+'"]').outerHTML]));true;`],
   ['key','ArrowRight','#exhibit'],['until','Number(document.getElementById("exhibit").dataset.angle)>14.9'],
   check(`Object.entries(beforeOrbit).every(([n,v])=>document.querySelector('[data-name="'+n+'"]').outerHTML!==v)`,'keyboard turns specimen, base, chamber structure and gauge together'),
   ['drag','#exhibit',.3,.5,.7,.5,15],
@@ -60,7 +60,7 @@ const steps=[
 if(reduced)steps.push(check('document.getElementById("auto-rotate").disabled','reduced motion disables automatic rotation'));
 else steps.push(['click','#auto-rotate'],['wait',500],check('Number(document.getElementById("exhibit").dataset.angle)>1','automatic rotation advances'),['click','[data-module="name"]'],check('document.getElementById("auto-rotate").getAttribute("aria-pressed")==="false"','interaction stops tour'));
 writeFileSync(`shots/${mode}-actions.json`,JSON.stringify(steps,null,2));
-if(heart){
+{
   if(phone)steps.push(['scroll','#exhibit'],['turn',0],['touchdrag','#exhibit',.3,.5,.7,.5,15],check('Number(document.getElementById("exhibit").dataset.angle)>20','real touch drag rotates without triggering a module'));
   if(reduced)steps.push(['eval','window.frozenPhase=document.getElementById("exhibit").dataset.heartPhase;true'],['wait',400],check('document.getElementById("exhibit").dataset.heartPhase===frozenPhase&&document.querySelector(".steam-layer").dataset.count==="0"','reduced motion stops idle and steam'));
   else steps.push(
@@ -78,6 +78,6 @@ if(heart){
   );
   writeFileSync(`shots/${mode}-actions.json`,JSON.stringify(steps,null,2));
 }
-const result=spawnSync(process.execPath,['scripts/drive.mjs',heart?'experiments/heart-v03/index.html':'index.html','--actions',`shots/${mode}-actions.json`,'--width',phone?'390':'1440','--height',phone?'1100':'1500',...(reduced?['--reduced']:[])],{encoding:'utf8',env:{...process.env,CHROME_PATH:chrome},windowsHide:true});
+const result=spawnSync(process.execPath,['scripts/drive.mjs','index.html','--actions',`shots/${mode}-actions.json`,'--width',phone?'390':'1440','--height',phone?'1100':'1500',...(reduced?['--reduced']:[])],{encoding:'utf8',env:{...process.env,CHROME_PATH:chrome},windowsHide:true});
 writeFileSync(`shots/${mode}-checks.log`,result.stdout+result.stderr);console.log(result.stdout);console.error(result.stderr);
 assert.equal(result.status,0);assert(result.stdout.includes('console: clean'));

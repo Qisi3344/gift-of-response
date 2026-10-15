@@ -1,13 +1,16 @@
 {
   "styles": [
     "src/styles/anatomy.css",
-    "src/styles/site.css"
+    "src/styles/site.css",
+    "src/styles/heart.css"
   ],
   "runtime": [
     "src/runtime/anatomy-kit.js",
     "src/runtime/state-machine.js",
     "src/runtime/scene-config.js",
     "src/runtime/exhibit.js",
+    "src/runtime/steam.js",
+    "src/runtime/heart-motion.js",
     "src/runtime/interaction.js"
   ]
 }
