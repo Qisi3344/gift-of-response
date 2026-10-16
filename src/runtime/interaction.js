@@ -47,6 +47,8 @@
     const text = M.readout(state);
     if (text !== previousReadout) { document.querySelector('[data-readout]').textContent = text; previousReadout = text; }
     stage.dataset.selected = state.selected; stage.dataset.busy = String(Object.keys(state.jobs).length>0);
+    const vowed = M.finale(state); stage.dataset.finale = String(vowed);
+    const vow = $('vow'); if (vowed && vow.hidden) { vow.hidden = false; requestAnimationFrame(() => vow.classList.add('shown')); }
     if(mechanics){const busy=Object.keys(state.jobs).length>0||Math.abs(state.turn-state.targetTurn)>.001;document.querySelectorAll('[data-module],#name-form button,#previous-memory,#next-memory').forEach(el=>el.disabled=busy);}
     for (const key of ['language','creation','affection']) document.querySelector(`[data-trigger="${key}"]`).disabled = state.jobs[key] !== undefined;
   }

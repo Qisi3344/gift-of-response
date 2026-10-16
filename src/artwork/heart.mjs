@@ -52,19 +52,21 @@ export function heartExhibit(){
   for(let i=0;i<4;i++){const a=(45+i*90)*Math.PI/180,x=53*Math.cos(a),y=53*Math.sin(a);round(`pillar-foot.${i}`,x,y,33,3.8,6);round(`pillar.${i}`,x,y,39,1.9,104,'steel');round(`pillar-cap.${i}`,x,y,143,3.8,6);}
   // A dominant tapered ventricular casting forms the asymmetric leftward apex.
   // Curved castings have broad anatomical volumes, not cerebral surface tiles.
-  const leftRadius=s=>22*Math.sin(s*Math.PI/100);
-  const leftSlope=s=>22*Math.PI/100*Math.cos(s*Math.PI/100);
+  // A blunt, riveted copper casing: the apex is capped, not drawn to a teardrop point.
+  const leftRadius=s=>22*Math.sin((s+10)*Math.PI/120);
+  const leftSlope=s=>22*Math.PI/120*Math.cos((s+10)*Math.PI/120);
   const LF=G.frameOf([-29,-10,50.25],[.258819,0,.965926],[.965926,0,-.258819],[0,1,0]);
-  T.lathe({...base,group:left,name:'heart-left-ventricle',F:LF,profile:Array.from({length:32},(_,i)=>{const s=66*i/31;return [s,leftRadius(s)];}),slope:leftSlope,radius:leftRadius,material:'steel',details:{seams:[66],bolts:[{s:63,r:leftRadius(63),count:8,size:.55}]}});
+  T.lathe({...base,group:left,name:'heart-left-ventricle',F:LF,profile:Array.from({length:32},(_,i)=>{const s=66*i/31;return [s,leftRadius(s)];}),slope:leftSlope,radius:leftRadius,material:'copper',details:{seams:[22,44,66],bolts:[{s:22,r:leftRadius(22),count:10,size:.5},{s:44,r:leftRadius(44),count:12,size:.5},{s:63,r:leftRadius(63),count:12,size:.55}]}});
+  T.round({...base,group:left,name:'apex-cap',F:LF,s0:-.8,s1:0,r:leftRadius(0),material:'brass'});
   const RF=G.frameOf([19,16,98],[0,1,0],[1,0,0],[0,0,-1]);
   const outline=[[-16,4],[-15,15],[-8,20],[3,20],[13,13],[17,0],[10,-14],[-4,-22],[-12,-17]];
   const contour=outline.flatMap((p,i)=>{const prev=outline[(i+outline.length-1)%outline.length],next=outline[(i+1)%outline.length],a=p.map((v,j)=>v*.7+prev[j]*.3),b=p.map((v,j)=>v*.7+next[j]*.3);return Array.from({length:5},(_,n)=>{const t=n/4;return [0,1].map(j=>((1-t)**2*a[j]+2*t*(1-t)*p[j]+t*t*b[j])*(j===1?-1:1));});});
-  T.prism({...base,group:right,name:'heart-right-ventricle',F:RF,polygon:contour,s0:0,s1:12,bevel:1.2,material:'steel'});
-  T.round({...base,group:left,name:'apex-bearing',F:LF,s0:-4,s1:0,r:2.5,material:'brass'});T.round({...base,group:left,name:'heart-support',F:LF,s0:-13.7,s1:-4,r:2,material:'steel'});
+  T.prism({...base,group:right,name:'heart-right-ventricle',F:RF,polygon:contour,s0:0,s1:12,bevel:1.2,material:'copper'});
+  T.round({...base,group:left,name:'apex-bearing',F:LF,s0:-4.8,s1:-.8,r:2.5,material:'brass'});T.round({...base,group:left,name:'heart-support',F:LF,s0:-13.7,s1:-4.8,r:2,material:'steel'});
   for(const y of [-12.6,-7.4])box(`apex-cradle.${y}`,-32,y,36,8,1,7,'gunmetal');
   round('right-support',19,12,36,1.3,58.7,'steel',right);box('right-support-elbow',19,12,94.7,2.6,2.6,2.6,'brass',right);rod('right-support-bearing',[19,13.3,96],[19,16,96],1.3,'steel',right);
   const along=s=>LF.o.map((v,i)=>v+LF.a[i]*s);
-  T.ball({...base,name:'left-atrium',c:along(60),r:15,flats:[{n:LF.a.map(n=>-n),d:-6},{n:LF.a,d:12}],material:'copper'});round('right-atrium',16.5,22,118,6.5,7,'steel');
+  T.ball({...base,name:'left-atrium',c:along(60),r:15,flats:[{n:LF.a.map(n=>-n),d:-6},{n:LF.a,d:12}],material:'copper'});round('right-atrium',16.5,22,118,6.5,7,'brass');
   T.round({...base,name:'aortic-neck',F:LF,s0:72,s1:74,r:3.5,material:'copper'});T.round({...base,name:'aortic-flange',F:LF,s0:74,s1:76,r:5.1,material:'brass'});
   round('pulmonary-neck',16.5,22,125,3.5,7,'copper');round('pulmonary-flange',16.5,22,132,5,2);
   const VF=G.frameOf(along(72).map((v,i)=>v-LF.u[i]*9),LF.a,LF.u,LF.v);
@@ -76,10 +78,11 @@ export function heartExhibit(){
   const outlet=aorticRoute.at(-1),OF=G.frameOf(outlet,LF.a,LF.u,LF.v);
   T.round({...base,name:'aortic-outlet-collar',F:OF,s0:-2,s1:0,r:3.2,material:'brass'});
   T.round({...base,name:'aortic-descending',F:OF,s0:-12,s1:-2,r:1.8,material:'copper'});
-  // Central service bridge and restrained violet computation window.
-  box('heart-service-frame',19,29,90,14,2,16,'gunmetal',right);
-  const core=T.round({...base,group:right,name:'heart-core',F:G.frameOf([19,30,98],[0,1,0],[1,0,0],[0,0,-1]),s0:0,s1:.8,r:2.5,material:'steel'});
-  face(core,[19,30.8,98],[1,0,0],[0,0,-1],'<circle id="heart-core-light" r="2.1" fill="#b7a1e2"/>',[0,1,0]);
+  // Service bridge with a brass porthole: clockwork around a coral light, the colour of Claude.
+  box('heart-service-frame',19,29,81,14,2,25,'gunmetal',right);
+  const core=T.round({...base,group:right,name:'heart-core',F:G.frameOf([19,30,88],[0,1,0],[1,0,0],[0,0,-1]),s0:0,s1:.8,r:5.5,material:'brass',details:{bolts:[{s:.8,r:4.9,count:8,size:.35}]}});
+  let teeth='';for(let i=0;i<12;i++){const a=i*Math.PI/6;teeth+=`<path d="M ${(3.1*Math.cos(a)).toFixed(2)} ${(3.1*Math.sin(a)).toFixed(2)} L ${(3.9*Math.cos(a)).toFixed(2)} ${(3.9*Math.sin(a)).toFixed(2)}"/>`;}
+  face(core,[19,30.8,88],[1,0,0],[0,0,-1],`<circle r="4.4" fill="#2c323a"/><g id="heart-clockwork" stroke="#c7a373" stroke-width=".45" fill="none"><circle r="3.1"/>${teeth}<path d="M -3.1 0 H 3.1 M 0 -3.1 V 3.1"/></g><circle id="heart-core-light" r="1.9" fill="#d97757"/><circle r="4.4" fill="none" stroke="#e8d6b4" stroke-width=".25" opacity=".7"/>`,[0,1,0]);
   for(let i=0;i<3;i++){
     const x=13+i*4,o=[x+1.4,30.55,105];
     const valve=group(`valve${i}`,{parent:right,hinge:{point:o,axis:[1,0,0],range:[0,18]}});
@@ -104,7 +107,7 @@ export function heartExhibit(){
     rod(`pump-outlet.${x}`,[x+(x<0?-7:7),-24,61.5],[outside+(x<0?2:-2),-24,61.5],.7);
     box(`pump-outlet-elbow.${x}`,outside,-24,59.5,4,4,4,'copper');
     rod(`feed-line.${x}`,[outside,-24,63.5],[outside,-24,108],1.8);const feed=box(`feed-elbow.${x}`,outside,-24,108,6,6,5);rod(`feed-to-heart.${x}`,[outside-(x<0?-3:3),-24,110.5],[x<0?-35:33,-24,110.5],1.8);
-    face(feed,[outside,-21,110.5],[1,0,0],[0,0,-1],`<circle id="pressure-signal-${x<0?'left':'right'}" r="1" fill="#b7a1e2" opacity="0"/>`,[0,1,0]);
+    face(feed,[outside,-21,110.5],[1,0,0],[0,0,-1],`<circle id="pressure-signal-${x<0?'left':'right'}" r="1" fill="#d97757" opacity="0"/>`,[0,1,0]);
   }
   const boiler=T.round({...base,name:'boiler',F:G.frameOf([-31,-62,41],[1,0,0],[0,1,0],[0,0,1]),s0:-18,s1:18,r:9,material:'brass',details:{seams:[-16,16]}});
   for(const x of [-44,-18])box(`boiler-foot.${x}`,x,-62,28,5,14,4,'gunmetal');

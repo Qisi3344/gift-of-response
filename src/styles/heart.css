@@ -9,5 +9,10 @@ body.iso[data-theme="light"] .stage [data-mat="brass"]{--anatomy-paper:#b58d56;-
 body.iso[data-theme="light"] .stage [data-mat="copper"]{--anatomy-paper:#926a55;--anatomy-top:#b18a71;--anatomy-shade-0:#6f4e3d;--anatomy-shade-1:#805b48;--anatomy-shade-2:#926a55;--anatomy-shade-3:#a58065;--anatomy-hi:#5f4638;--anatomy-mid:#735545;--anatomy-lo:#937665;--anatomy-faint:#ad9586}
 body.iso[data-theme="light"] .stage [data-mat="steel"]{--anatomy-paper:#b7bec4;--anatomy-top:#e2e6e9;--anatomy-shade-0:#78848d;--anatomy-shade-1:#99a3ac;--anatomy-shade-2:#c5cbd0;--anatomy-shade-3:#d7dce0;--anatomy-hi:#66727b;--anatomy-mid:#89939b;--anatomy-lo:#a6afb6;--anatomy-faint:#c7ced3}
 body.iso[data-theme="light"] .stage [data-mat="gunmetal"]{--anatomy-paper:#343941;--anatomy-top:#4e555e;--anatomy-shade-0:#252a32;--anatomy-shade-1:#2c323a;--anatomy-shade-2:#343941;--anatomy-shade-3:#424954;--anatomy-mid:#262b32;--anatomy-lo:#5a626c;--anatomy-faint:#626a72}
-.stage .steam-layer{z-index:3;pointer-events:none}.stage [data-name="heart-core"]{--anatomy-top:#b7a1e2;--anatomy-shade-0:#8977c0;--anatomy-shade-1:#9a87ce;--anatomy-shade-2:#b7a1e2;--anatomy-shade-3:#c5b2ec}
+.stage .steam-layer{z-index:3;pointer-events:none}
+.iso-plate[data-finale="true"] #heart-core-light{opacity:1!important;fill:#f0a07f;transition:fill 1.2s ease}
+.vow{margin:18px 0 0;text-align:center;font-size:clamp(20px,3.2vw,28px);letter-spacing:.32em;color:#b4624a;opacity:0;transition:opacity 2.4s ease}
+.vow span{display:block;margin-top:6px;font-size:12px;letter-spacing:.18em;color:#8d7551;font-style:italic}
+.vow.shown{opacity:1}
+@media (prefers-reduced-motion:reduce){.vow{transition:none}}
 .stage [data-name="heart-valve.0"],.stage [data-name="heart-valve.1"],.stage [data-name="heart-valve.2"]{--anatomy-weight:.5px}

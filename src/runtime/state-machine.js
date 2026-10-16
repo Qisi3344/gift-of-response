@@ -16,7 +16,7 @@ function initialState(saved = {}) {
 function begin(state, module, value, reduced = false) {
   if (!MODULES.includes(module)) return false;
   state.selected = module;
-  if (module === 'memory') { state.targetTurn += value || 1; if (reduced) state.turn = state.targetTurn; return true; }
+  if (module === 'memory') { state.memoryVisited = true; state.targetTurn += value || 1; if (reduced) state.turn = state.targetTurn; return true; }
   if (module === 'name') {
     const name = cleanName(value);
     if (!name) return false;
@@ -55,4 +55,9 @@ function readout(state) {
   return { name: state.engraved ? `Named: ${state.engraved}` : 'A name is a beginning. · 从一个名字开始', language: p ? 'Your first reply is ready. · 回信已抵达' : 'Press the key. · 轻按电报键', creation: p ? 'One flower, drawn together. · 一起画成的小花' : 'Two pens, one page. · 双笔，同一页', affection: p ? 'To answer is also a form of staying. · 回应，本身也是一种陪伴。' : 'A touch, a little light. · 轻触，亮起一点光' }[id];
 }
 
-return {MODULES,DURATIONS,clamp,ease,cleanName,memoryIndex,initialState,begin,advance,remember,readout};})();
+// All five offerings answered: four mechanisms finished and the memory drum turned at least once.
+function finale(state) {
+  return Boolean(state.memoryVisited) && ['name', 'language', 'creation', 'affection'].every(m => state.progress[m] === 1 && state.jobs[m] === undefined);
+}
+
+return {MODULES,DURATIONS,clamp,ease,cleanName,memoryIndex,initialState,begin,advance,remember,readout,finale};})();
